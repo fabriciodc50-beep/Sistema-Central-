@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lumiar · Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0B0B; --bg:#111213; --panel:#1B1C1D; --panel2:#242526;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.035); --gl:rgba(200,160,112,.18);
+  --ink:#F6F5F3; --ink2:#A9A6A0; --ink3:#8a8781;
+  --am:#C8A070; --am2:#A8814F; --ami:#1C1509;
+  --ok:#4ADE80; --warn:#F97316; --err:#F87171;
+  --s1:0 1px 2px rgba(0,0,0,.6); --s2:0 8px 22px rgba(0,0,0,.45); --s3:0 28px 64px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--void);overflow-x:hidden;max-width:100vw;}
+body{color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-weight:300;
+  font-variant-numeric:tabular-nums;min-height:100vh;position:relative;
+  background:
+    radial-gradient(900px 500px at 15% -8%, rgba(200,160,112,.10), transparent 55%),
+    radial-gradient(700px 800px at 100% 40%, rgba(200,160,112,.04), transparent 60%),
+    var(--void);}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+#login-screen, .wrap, .fab-nav, .sh, #portal-overlay, footer{position:relative;z-index:2;}
+button,input,select{font-family:inherit;}
+h1,h2,h3{font-family:"Space Grotesk",sans-serif;font-weight:500;margin:0;}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 100px;transition:margin-left .2s;}
+header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:8px;}
+header h1{font-size:30px;color:var(--ink);}
+header h1 em{color:var(--am);font-style:normal;}
+.status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);}
+
+.icn{width:19px;height:19px;stroke:var(--am);stroke-width:1.6;fill:none;vertical-align:-4px;margin-right:9px;}
+h2{display:flex;align-items:center;font-size:13px;text-transform:uppercase;letter-spacing:.12em;
+  font-weight:500;color:var(--ink2);}
+
+/* ===== navegação: botão flutuante + painel deslizante com fundo escurecido ===== */
+.fab-btn{position:fixed;right:20px;bottom:24px;z-index:160;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(180deg,var(--am),var(--am2));border:none;box-shadow:var(--s3),0 0 24px rgba(200,160,112,.25);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.fab-btn:active{transform:scale(.92);}
+.fab-btn svg{width:22px;height:22px;stroke:var(--ami);stroke-width:2;fill:none;}
+
+.nav-backdrop{position:fixed;inset:0;background:rgba(6,6,7,.7);backdrop-filter:blur(6px);z-index:150;
+  display:flex;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.nav-backdrop.on{opacity:1;pointer-events:auto;}
+.fab-menu{width:min(300px,82vw);height:100%;background:var(--bg);border-left:1px solid var(--line);
+  padding:32px 22px;display:flex;flex-direction:column;gap:2px;transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.22,1,.36,1);overflow-y:auto;}
+.nav-backdrop.on .fab-menu{transform:translateX(0);}
+.fab-menu .brand-side{font-family:"Space Grotesk",sans-serif;font-size:21px;color:var(--ink);margin-bottom:8px;}
+.fab-menu .brand-side em{color:var(--am);font-style:normal;}
+.fab-menu-rule{width:32px;height:1px;background:var(--am);margin-bottom:22px;}
+.fab-menu button{background:none;border:none;color:var(--ink2);text-align:left;padding:12px 10px;
+  font-size:13px;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;}
+.fab-menu button:hover{background:rgba(200,160,112,.06);color:var(--ink);}
+.fab-menu button svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.4;fill:none;flex-shrink:0;}
+.fab-menu hr{border:none;border-top:1px solid var(--line2);margin:10px 0;}
+
+@media(min-width:960px){
+  body{padding-left:220px;}
+  .fab-btn{display:none;}
+  .nav-backdrop{position:fixed;inset:0 auto 0 0;width:220px;background:none;backdrop-filter:none;
+    opacity:1;pointer-events:auto;justify-content:flex-start;}
+  .fab-menu{width:100%;transform:none;border-left:none;border-right:1px solid var(--line);padding:28px 16px;}
+  .wrap{max-width:900px;margin:0;padding:32px 40px 100px;}
+}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:32px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:18px;box-shadow:var(--s1);}
+.card .n{font-size:32px;color:var(--ink);font-family:"Space Grotesk",sans-serif;}
+.card .l{font-size:12px;color:var(--ink2);margin-top:2px;}
+.card.warn .n{color:var(--warn);}
+
+/* ===== hero / saudação ===== */
+.hero-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.brand-mark{width:44px;height:44px;border-radius:2px;flex-shrink:0;background:var(--am);
+  color:var(--ami);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--s2);}
+.greet{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;}
+.hero-header h1{font-size:24px;text-transform:uppercase;letter-spacing:.04em;font-weight:400;}
+.hero-header h1 em{color:var(--am);font-style:normal;}
+
+/* ===== banner — escuro dominante, dourado como acento fino, não bloco de cor ===== */
+.hero-panel{position:relative;background:linear-gradient(155deg,#17181A,#0F1011);border:1px solid rgba(200,160,112,.18);
+  border-radius:4px;padding:26px 24px 8px;margin-bottom:18px;box-shadow:var(--s3);overflow:hidden;}
+.hero-panel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--am),transparent);}
+.hero-panel::after{content:'';position:absolute;right:-60px;top:-80px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,160,112,.16),transparent 70%);pointer-events:none;}
+.hp-top{display:flex;align-items:center;gap:16px;margin-bottom:22px;position:relative;}
+.hp-icon{width:38px;height:38px;border:1px solid rgba(200,160,112,.35);border-radius:2px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;background:rgba(200,160,112,.06);}
+.hp-icon svg{width:17px;height:17px;stroke:var(--am);stroke-width:1.4;fill:none;}
+.hp-eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--am);opacity:.9;margin-bottom:5px;}
+.hp-eyebrow::before{content:'— ';}
+.hp-title{font-family:"Space Grotesk",sans-serif;font-size:20px;font-weight:500;line-height:1.3;color:var(--ink);}
+.hp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid rgba(200,160,112,.14);
+  padding-top:16px;position:relative;}
+.hp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:6px 10px 20px;
+  border-left:1px solid rgba(200,160,112,.1);}
+.hp-stat:nth-child(3n+1){border-left:none;}
+.hp-stat svg{width:14px;height:14px;stroke:var(--am);stroke-width:1.3;fill:none;opacity:.65;}
+.hp-stat .n{font-family:"Space Grotesk",sans-serif;font-size:30px;font-weight:500;color:var(--ink);letter-spacing:-.01em;}
+.hp-stat .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);}
+.hp-stat.warn .n{color:var(--warn);}
+.hp-stat.warn svg{stroke:var(--warn);}
+
+/* ===== pílulas de ação rápida — contorno fino, tipografia versalete ===== */
+.pill-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:24px;}
+.pill{flex-shrink:0;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid rgba(200,160,112,.4);
+  color:var(--ink);border-radius:2px;padding:12px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+  cursor:pointer;transition:all .18s;}
+.pill:active{transform:scale(.96);background:rgba(200,160,112,.08);}
+.pill:hover{border-color:var(--am);}
+.pill svg{width:14px;height:14px;stroke:var(--am);stroke-width:1.6;fill:none;}
+
+/* ===== grade de navegação — arquitetônica, sem sombra suave genérica ===== */
+.nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);margin-bottom:30px;
+  border:1px solid var(--line);}
+.nav-card{background:var(--void);padding:22px 18px;cursor:pointer;transition:background .18s;position:relative;}
+.nav-card:active{background:var(--panel2);}
+.nav-card:hover{background:#0F0F10;}
+.nav-card:hover .nc-icon svg{stroke:var(--am);}
+.nc-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.nc-icon svg{width:20px;height:20px;stroke:var(--ink2);stroke-width:1.3;fill:none;transition:stroke .18s;}
+.nc-title{font-family:"Space Grotesk",sans-serif;font-size:19px;color:var(--ink);margin-bottom:3px;}
+.nc-sub{font-size:10.5px;color:var(--ink3);letter-spacing:.03em;line-height:1.4;text-transform:uppercase;}
+@media(min-width:640px){ .nav-grid{grid-template-columns:repeat(3,1fr);} }
+@media(min-width:960px){ .nav-grid{grid-template-columns:repeat(3,1fr);} .hp-stats{grid-template-columns:repeat(6,1fr);} }
+
+/* ===== telas separadas por tópico ===== */
+.view{animation:fade .3s ease;}
+.view-head{margin-bottom:26px;}
+.back-btn{background:none;border:none;color:var(--ink3);font-size:12px;display:flex;align-items:center;gap:4px;
+  cursor:pointer;padding:0;margin-bottom:18px;}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+.view-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--am);margin-bottom:4px;}
+.view-eyebrow::before{content:'— ';}
+.view-title{font-size:34px;color:var(--ink);text-transform:uppercase;letter-spacing:.03em;font-weight:300;}
+.view-rule{width:44px;height:2px;background:linear-gradient(90deg,var(--am),transparent);margin-top:14px;}
+
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:18px;
+  border-top:1px solid var(--line);}
+.pager-idx{font-size:10.5px;letter-spacing:.12em;color:var(--ink3);font-variant-numeric:tabular-nums;}
+.pager button{background:none;border:none;color:var(--ink3);font-size:12px;display:flex;align-items:center;
+  gap:6px;cursor:pointer;padding:8px 4px;text-transform:uppercase;letter-spacing:.06em;}
+.pager button.next{color:var(--am);}
+.pager svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+.pager button:hover{color:var(--ink);}
+.pager button.next:hover{color:var(--am2);}
+
+section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:24px;margin-bottom:20px;box-shadow:var(--s2);}
+section h2{font-size:20px;margin-bottom:16px;color:var(--ink);}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;}
+@media(max-width:640px){.form-row{grid-template-columns:1fr;}}
+input,select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:2px;
+  padding:11px 13px;font-size:14px;outline:none;}
+input:focus,select:focus{border-color:var(--am);}
+input::placeholder{color:var(--ink3);}
+button.primary{background:var(--am);color:var(--ami);border:none;text-transform:uppercase;letter-spacing:.08em;
+  border-radius:2px;padding:11px 20px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;}
+button.primary:active{transform:scale(.96);}
+button.primary:hover{background:var(--am2);}
+button.primary:disabled{opacity:.5;cursor:default;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+.table-scroll{overflow-x:auto;margin:0 -22px;padding:0 22px;-webkit-overflow-scrolling:touch;}
+.table-scroll table{min-width:520px;}
+th{text-align:left;color:var(--ink3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+  padding:8px 10px;border-bottom:1px solid var(--line);}
+td{padding:10px;border-bottom:1px solid var(--line2);color:var(--ink2);}
+tr:last-child td{border-bottom:none;}
+td.nome{color:var(--ink);}
+.badge{display:inline-block;padding:3px 9px;border-radius:2px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;background:var(--panel2);color:var(--ink2);}
+.badge.novo{color:var(--am);background:rgba(200,160,112,.12);}
+.empty{color:var(--ink3);font-size:13px;padding:20px 0;text-align:center;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--panel2);border:1px solid var(--line);padding:12px 20px;border-radius:2px;font-size:13px;
+  box-shadow:var(--s3);transition:all .3s;pointer-events:none;z-index:99;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,11,.9);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:10px 20px;display:flex;justify-content:space-between;
+  align-items:center;font-size:11px;color:var(--ink3);}
+footer button{background:none;border:none;color:var(--ink3);font-size:11px;cursor:pointer;text-decoration:underline;}
+.sh{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:100;}
+.sh.on{display:flex;}
+.sh .pn{background:var(--panel);width:100%;max-width:480px;margin:0 auto;border-radius:4px 4px 0 0;
+  padding:24px;max-height:70vh;overflow-y:auto;box-shadow:var(--s3);}
+.sh .pn h3{margin-bottom:14px;}
+.sh .pn .v{padding:10px 0;border-bottom:1px solid var(--line2);font-size:13px;color:var(--ink2);}
+.sh .pn .v b{color:var(--ink);}
+
+.login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(700px 900px at 78% 15%, rgba(200,160,112,.14), transparent 55%),
+    radial-gradient(500px 500px at 10% 90%, rgba(200,160,112,.05), transparent 60%),
+    var(--void);
+  z-index:300;padding:20px;}
+.login-box{width:100%;max-width:380px;background:rgba(20,20,22,.55);backdrop-filter:blur(14px);
+  border:1px solid rgba(200,160,112,.22);border-radius:4px;padding:44px 32px 36px;box-shadow:var(--s3);text-align:center;}
+.login-box .mark{font-size:10.5px;letter-spacing:.24em;color:var(--am);text-transform:uppercase;margin-bottom:10px;}
+.login-box h1{font-size:28px;margin-bottom:8px;color:var(--ink);text-transform:uppercase;letter-spacing:.08em;font-weight:400;}
+.login-box .rule{width:36px;height:1px;background:var(--am);margin:0 auto 24px;}
+.login-box input{width:100%;margin-bottom:14px;text-align:left;background:transparent;border:none;
+  border-bottom:1px solid var(--line);border-radius:0;padding:10px 2px;font-size:14px;}
+.login-box input:focus{border-color:var(--am);}
+.login-box input::placeholder{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);}
+.login-box .sub{color:var(--ink3);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:28px;}
+.login-box button.primary{border-radius:2px;text-transform:uppercase;letter-spacing:.12em;font-size:12px;
+  background:linear-gradient(90deg,var(--am2),var(--am));border:none;color:var(--ami);padding:15px;font-weight:600;
+  box-shadow:0 8px 20px rgba(200,160,112,.25);}
+.login-box button.primary:hover{filter:brightness(1.08);}
+.login-box .link-btn{background:none;border:none;color:var(--ink3);font-size:11px;text-transform:uppercase;
+  letter-spacing:.06em;cursor:pointer;margin-top:20px;width:100%;}
+.login-err{color:var(--err);font-size:12px;margin-top:14px;min-height:14px;}
+
+.steps{display:flex;flex-direction:column;gap:2px;margin:8px 0;}
+.step{display:flex;align-items:center;gap:14px;padding:10px 4px;position:relative;}
+.step .dot{width:24px;height:24px;border-radius:50%;background:var(--panel2);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:var(--ink3);z-index:1;}
+.step.done .dot{background:var(--am);border-color:var(--am);color:var(--ami);}
+.step.current .dot{background:var(--ami);border-color:var(--am);color:var(--am);box-shadow:0 0 0 4px rgba(200,160,112,.15);}
+.step .line{position:absolute;left:15px;top:34px;width:2px;height:calc(100% - 6px);background:var(--line);}
+.step.done .line{background:var(--am);}
+.step .label{font-size:13px;color:var(--ink3);}
+.step.done .label,.step.current .label{color:var(--ink);}
+.step.current .label{font-weight:500;}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px;}
+.row:last-child{border-bottom:none;}
+.row .l{color:var(--ink2);}
+.row .v{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="mark">Lumiar Retratos</div>
+    <h1>Central</h1>
+    <div class="rule"></div>
+    <p class="sub" id="login-sub">Entre com seu acesso de proprietário.</p>
+    <input id="lg-email" type="email" placeholder="E-mail" autocomplete="username">
+    <input id="lg-senha" type="password" placeholder="Senha" autocomplete="current-password">
+    <button class="primary" style="width:100%" id="lg-btn" onclick="fazerLogin()">Entrar</button>
+    <button class="link-btn" id="lg-toggle" onclick="alternarModoLogin()">Primeiro acesso? Criar conta</button>
+    <div class="login-err" id="lg-err"></div>
+  </div>
+</div>
+
+<button class="fab-btn" onclick="toggleFabMenu()" id="fab-toggle">
+  <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="nav-backdrop" id="nav-backdrop" onclick="if(event.target===this) toggleFabMenu()">
+  <nav class="fab-menu" id="fab-menu">
+    <div class="brand-side">Lumiar · <em>Central</em></div>
+    <div class="fab-menu-rule"></div>
+    <button onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>Visão geral</button>
+    <button onclick="mostrarView('leads')"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads</button>
+    <button onclick="mostrarView('opps')"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg>Oportunidades</button>
+    <button onclick="mostrarView('projetos')"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Projetos</button>
+    <button onclick="mostrarView('catalogo')"><svg viewBox="0 0 24 24"><path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82z"/></svg>Catálogo</button>
+    <button onclick="mostrarView('agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</button>
+    <hr>
+    <button onclick="exportarBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exportar backup</button>
+    <button onclick="sair()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </nav>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+
+  <div class="view" id="view-home">
+<header class="hero-header">
+    <div class="brand-mark">✦</div>
+    <div>
+      <div class="greet" id="greet">Boa noite</div>
+      <h1>Central <em>da Lumiar</em></h1>
+    </div>
+  </header>
+
+  <div class="hero-panel">
+    <div class="hp-top">
+      <div class="hp-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="hp-text">
+        <div class="hp-eyebrow">Sistema em operação</div>
+        <div class="hp-title">Tudo conectado ao banco, em tempo real.</div>
+      </div>
+    </div>
+    <div class="hp-stats" id="cards" style="scroll-margin-top:20px">
+      <div class="hp-stat"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><b class="n">–</b><span class="l">Leads</span></div>
+      <div class="hp-stat"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg><b class="n">–</b><span class="l">Oportun.</span></div>
+      <div class="hp-stat"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg><b class="n">–</b><span class="l">Clientes</span></div>
+      <div class="hp-stat"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><b class="n">–</b><span class="l">Projetos</span></div>
+      <div class="hp-stat"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><b class="n">–</b><span class="l">Sessões</span></div>
+      <div class="hp-stat warn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><b class="n">–</b><span class="l">Atrasadas</span></div>
+    </div>
+  </div>
+
+  <div class="pill-row">
+    <button class="pill" onclick="mostrarView('leads')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Novo lead</button>
+    <button class="pill" onclick="mostrarView('agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agendar</button>
+    <button class="pill" onclick="exportarBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Backup</button>
+  </div>
+
+  <div class="nav-grid">
+    <div class="nav-card" onclick="mostrarView('leads')">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="nc-title">Leads</div><div class="nc-sub">Novos contatos e conversão</div>
+    </div>
+    <div class="nav-card" onclick="mostrarView('opps')">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg></div>
+      <div class="nc-title">Oportunidades</div><div class="nc-sub">Negociações em aberto</div>
+    </div>
+    <div class="nav-card" onclick="mostrarView('projetos')">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="nc-title">Projetos</div><div class="nc-sub">Etapas, contratos e Kanban</div>
+    </div>
+    <div class="nav-card" onclick="mostrarView('catalogo')">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82z"/></svg></div>
+      <div class="nc-title">Catálogo</div><div class="nc-sub">Serviços e produtos</div>
+    </div>
+    <div class="nav-card" onclick="mostrarView('agenda')">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+      <div class="nc-title">Agenda</div><div class="nc-sub">Sessões e compromissos</div>
+    </div>
+    <div class="nav-card" onclick="exportarBackup()">
+      <div class="nc-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></div>
+      <div class="nc-title">Backup</div><div class="nc-sub">Exportar tudo em JSON</div>
+    </div>
+  </div>
+  </div>
+
+  <div class="view" id="view-leads" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Comercial</div>
+      <h1 class="view-title">Leads</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-leads"><svg class="icn" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Novo lead</h2>
+    <div class="form-row">
+      <input id="f-nome" placeholder="Nome">
+      <input id="f-tel" placeholder="Telefone / WhatsApp">
+      <select id="f-nicho"><option value="">Nicho…</option></select>
+      <button class="primary" id="f-btn" onclick="criarLead()">Adicionar</button>
+    </div>
+  </section>
+    <section>
+    <h2>Leads recentes</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Nome</th><th>Nicho</th><th>Status</th><th>Criado em</th><th></th></tr></thead>
+      <tbody id="tbl-leads"><tr><td colspan="5" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <span class="pager-idx">02 / 06</span>
+      <button class="next" onclick="mostrarView('opps')">Oportunidades<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-opps" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Comercial</div>
+      <h1 class="view-title">Oportunidades</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-opps"><svg class="icn" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>Oportunidades</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Nome</th><th>Nicho</th><th>Valor est.</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tbl-opps"><tr><td colspan="5" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('leads')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Leads</button>
+      <span class="pager-idx">03 / 06</span>
+      <button class="next" onclick="mostrarView('projetos')">Projetos<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-projetos" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Operação</div>
+      <h1 class="view-title">Projetos</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-projetos"><svg class="icn" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Projetos</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Cliente</th><th>Projeto</th><th>Valor</th><th>Etapa</th><th>Financeiro</th><th>Portal</th></tr></thead>
+      <tbody id="tbl-projetos"><tr><td colspan="6" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('opps')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Oportunidades</button>
+      <span class="pager-idx">04 / 06</span>
+      <button class="next" onclick="mostrarView('catalogo')">Catálogo<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-catalogo" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Operação</div>
+      <h1 class="view-title">Catálogo</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-catalogo"><svg class="icn" viewBox="0 0 24 24"><path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82z"/><circle cx="7.5" cy="7.5" r="1"/></svg>Catálogo · Serviços por nicho</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Nicho</th><th>Serviço</th><th>Preço base</th><th></th></tr></thead>
+      <tbody id="tbl-servicos"><tr><td colspan="4" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <section>
+    <h2><svg class="icn" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>Catálogo · Produtos</h2>
+    <div class="form-row" style="margin-bottom:16px">
+      <select id="p-categoria">
+        <option value="impressao_avulsa">Impressão avulsa</option>
+        <option value="quadro">Quadro</option>
+        <option value="album">Álbum</option>
+        <option value="caixa_estojo_pendrive">Caixa/estojo p/ pendrive</option>
+        <option value="caixa_estojo_luva_album">Caixa/luva p/ álbum</option>
+        <option value="acessorio">Acessório</option>
+        <option value="outro">Outro</option>
+      </select>
+      <input id="p-nome" placeholder="Nome do produto">
+      <input id="p-tamanho" placeholder="Tamanho (opcional)">
+      <input id="p-preco" type="number" placeholder="Preço">
+      <button class="primary" onclick="criarProduto()">Adicionar</button>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Categoria</th><th>Produto</th><th>Tamanho</th><th>Preço</th><th>Estoque</th><th></th></tr></thead>
+      <tbody id="tbl-produtos"><tr><td colspan="6" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('projetos')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Projetos</button>
+      <span class="pager-idx">05 / 06</span>
+      <button class="next" onclick="mostrarView('agenda')">Agenda<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-agenda" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Operação</div>
+      <h1 class="view-title">Agenda</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-agenda"><svg class="icn" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</h2>
+    <div class="form-row" style="margin-bottom:16px">
+      <select id="ag-projeto"><option value="">Projeto…</option></select>
+      <select id="ag-tipo">
+        <option value="sessao">Sessão</option>
+        <option value="reuniao">Reunião</option>
+        <option value="entrega">Entrega</option>
+        <option value="revelacao">Revelação</option>
+        <option value="outro">Outro</option>
+      </select>
+      <input id="ag-data" type="datetime-local">
+      <input id="ag-local" placeholder="Local (opcional)">
+      <button class="primary" onclick="criarEvento()">Agendar</button>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Quando</th><th>Cliente</th><th>Tipo</th><th>Local</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tbl-agenda"><tr><td colspan="6" class="empty">carregando…</td></tr></tbody>
+    </table></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('catalogo')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Catálogo</button>
+      <span class="pager-idx">06 / 06</span>
+      <button class="next" onclick="mostrarView('home')">Central<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <span>v2.3.0 · 30 ago 2026</span>
+  <button onclick="verVersoes()">histórico de versões</button>
+</footer>
+
+<div class="sh" id="sheet" onclick="if(event.target===this)fecharSheet()">
+  <div class="pn" id="sheet-content"></div>
+</div>
+
+<div id="portal-overlay" style="display:none;position:fixed;inset:0;background:var(--void);z-index:200;overflow-y:auto;">
+  <div style="max-width:640px;margin:0 auto;padding:20px 20px 60px">
+    <button onclick="fecharPortal()" style="background:var(--panel2);border:1px solid var(--line);color:var(--ink2);
+      padding:8px 16px;border-radius:10px;font-size:12px;margin-bottom:20px;cursor:pointer">← Voltar pra Central</button>
+    <div id="portal-content"><div class="empty">carregando…</div></div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://tfctfqmolfzatxlnhpdw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmY3RmcW1vbGZ6YXR4bG5ocGR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjE5NDQsImV4cCI6MjEwMzYzNzk0NH0.M3DYwIb-RYRR3Td_fOrHw8Uc94VWK3KGxQcigZhtgHg';
+
+async function sb(path, opts={}){
+  const token = sessaoAtual?.access_token || SB_KEY;
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    ...opts,
+    headers:{
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers||{})
+    }
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`${res.status}: ${t}`);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+// ===================== AUTENTICAÇÃO =====================
+let sessaoAtual = null;
+let modoCadastro = false;
+
+function salvarSessao(s){
+  sessaoAtual = s;
+  localStorage.setItem('lumiar_session', JSON.stringify({
+    access_token: s.access_token, refresh_token: s.refresh_token,
+    expires_at: Date.now() + (s.expires_in*1000)
+  }));
+}
+
+async function authFetch(path, body){
+  const res = await fetch(`${SB_URL}/auth/v1/${path}`, {
+    method:'POST',
+    headers:{ 'apikey': SB_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error_description || data.msg || data.error || 'Erro de autenticação');
+  return data;
+}
+
+async function fazerLogin(){
+  const email = document.getElementById('lg-email').value.trim();
+  const senha = document.getElementById('lg-senha').value;
+  const btn = document.getElementById('lg-btn');
+  const err = document.getElementById('lg-err');
+  err.textContent = '';
+
+  if(!email || !senha){ err.textContent = 'Preencha e-mail e senha'; return; }
+  if(senha.length < 6){ err.textContent = 'A senha precisa ter pelo menos 6 caracteres'; return; }
+
+  btn.disabled = true; btn.textContent = modoCadastro ? 'Criando conta…' : 'Entrando…';
+  try{
+    let sessao;
+    if(modoCadastro){
+      const r = await authFetch('signup', {email, password: senha});
+      if(!r.access_token){
+        err.textContent = 'Conta criada. Verifique seu e-mail se a confirmação estiver ativa, ou tente entrar.';
+        alternarModoLogin();
+        return;
+      }
+      sessao = r;
+    }else{
+      sessao = await authFetch('token?grant_type=password', {email, password: senha});
+    }
+    salvarSessao(sessao);
+    entrarNoApp();
+  }catch(e){
+    err.textContent = e.message;
+  }finally{
+    btn.disabled = false; btn.textContent = modoCadastro ? 'Criar conta' : 'Entrar';
+  }
+}
+
+function alternarModoLogin(){
+  modoCadastro = !modoCadastro;
+  document.getElementById('lg-btn').textContent = modoCadastro ? 'Criar conta' : 'Entrar';
+  document.getElementById('lg-toggle').textContent = modoCadastro ? 'Já tenho conta, entrar' : 'Primeiro acesso? Criar conta';
+  document.getElementById('login-sub').textContent = modoCadastro ? 'Crie o acesso único do proprietário.' : 'Entre com seu acesso de proprietário.';
+  document.getElementById('lg-err').textContent = '';
+}
+
+async function tentarRestaurarSessao(){
+  const raw = localStorage.getItem('lumiar_session');
+  if(!raw) return false;
+  const s = JSON.parse(raw);
+  if(Date.now() < s.expires_at - 60000){
+    sessaoAtual = s;
+    return true;
+  }
+  try{
+    const nova = await authFetch('token?grant_type=refresh_token', {refresh_token: s.refresh_token});
+    salvarSessao(nova);
+    return true;
+  }catch(e){
+    localStorage.removeItem('lumiar_session');
+    return false;
+  }
+}
+
+function sair(){
+  localStorage.removeItem('lumiar_session');
+  sessaoAtual = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function entrarNoApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  iniciarApp();
+}
+
+function toast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? 'var(--err)' : 'var(--line)';
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 3200);
+}
+
+function fmtData(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+async function carregarNichos(){
+  const nichos = await sb('nichos?select=id,nome&order=ordem.asc');
+  const sel = document.getElementById('f-nicho');
+  nichos.forEach(n=>{
+    const opt = document.createElement('option');
+    opt.value = n.id; opt.textContent = n.nome;
+    sel.appendChild(opt);
+  });
+}
+
+async function carregarCards(){
+  const hoje = new Date().toISOString();
+  const em7dias = new Date(Date.now()+7*24*3600*1000).toISOString();
+  const hojeSoData = new Date().toISOString().slice(0,10);
+
+  const [leadsNovos, oportAbertas, clientes, projetosAtivos, sessoes7d, parcelasAtrasadas1, parcelasAtrasadas2] = await Promise.all([
+    sb('leads?select=id&status=eq.novo'),
+    sb('opportunities?select=id&status=eq.aberta'),
+    sb('clients?select=id'),
+    sb('projects?select=id&status=not.in.(concluido,cancelado)'),
+    sb(`agenda_events?select=id&inicio=gte.${hoje}&inicio=lte.${em7dias}`),
+    sb('contract_installments?select=id&status=eq.atrasado'),
+    sb(`contract_installments?select=id&status=eq.pendente&vencimento=lt.${hojeSoData}`)
+  ]);
+
+  const cards = document.querySelectorAll('.hp-stat .n');
+  cards[0].textContent = leadsNovos.length;
+  cards[1].textContent = oportAbertas.length;
+  cards[2].textContent = clientes.length;
+  cards[3].textContent = projetosAtivos.length;
+  cards[4].textContent = sessoes7d.length;
+  cards[5].textContent = parcelasAtrasadas1.length + parcelasAtrasadas2.length;
+}
+
+async function carregarLeads(){
+  const leads = await sb('leads?select=id,person_id,nicho_id,status,created_at,persons(name,phone),nichos(nome)&order=created_at.desc&limit=10');
+  const tbody = document.getElementById('tbl-leads');
+  if(!leads.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum lead ainda. Cadastre o primeiro acima.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td class="nome">${l.persons?.name || '—'}</td>
+      <td>${l.nichos?.nome || '—'}</td>
+      <td><span class="badge ${l.status==='novo'?'novo':''}">${l.status}</span></td>
+      <td>${fmtData(l.created_at)}</td>
+      <td>${l.status==='convertido' ? '' : `<button class="primary" style="padding:6px 12px;font-size:11px" onclick="abrirConverter('${l.id}','${l.person_id}','${l.nicho_id||''}','${(l.persons?.name||'').replace(/'/g,"\\'")}')">Converter</button>`}</td>
+    </tr>
+  `).join('');
+}
+
+async function carregarOportunidades(){
+  const opps = await sb('opportunities?select=id,person_id,nicho_id,valor_estimado,status,persons(name),nichos(nome)&order=created_at.desc&limit=10');
+  const tbody = document.getElementById('tbl-opps');
+  if(!opps.length){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma oportunidade ainda. Converta um lead acima.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = opps.map(o => `
+    <tr>
+      <td class="nome">${o.persons?.name || '—'}</td>
+      <td>${o.nichos?.nome || '—'}</td>
+      <td>${o.valor_estimado ? 'R$ ' + Number(o.valor_estimado).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}</td>
+      <td><span class="badge ${o.status==='ganha'?'novo':''}">${o.status}</span></td>
+      <td>${o.status==='aberta' ? `<button class="primary" style="padding:6px 12px;font-size:11px" onclick="fecharOportunidade('${o.id}','${o.person_id}','${o.nicho_id||''}')">Fechar</button>` : ''}</td>
+    </tr>
+  `).join('');
+}
+
+async function carregarCatalogoServicos(){
+  const servicos = await sb('servicos?select=id,nome,preco_base,nichos(nome)&order=nome.asc');
+  const tbody = document.getElementById('tbl-servicos');
+  if(!servicos.length){ tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum serviço cadastrado.</td></tr>'; return; }
+  tbody.innerHTML = servicos.map(s => `
+    <tr>
+      <td>${s.nichos?.nome || '—'}</td>
+      <td class="nome">${s.nome}</td>
+      <td><input type="number" value="${s.preco_base}" id="sv-${s.id}" style="width:100px;padding:6px 8px"></td>
+      <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="salvarServico('${s.id}')">Salvar</button></td>
+    </tr>
+  `).join('');
+}
+
+async function salvarServico(id){
+  const preco = Number(document.getElementById(`sv-${id}`).value);
+  try{
+    await sb(`servicos?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({preco_base: preco}), prefer:'return=minimal'});
+    toast('Preço atualizado');
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+const CATEGORIA_LABEL = {
+  impressao_avulsa:'Impressão avulsa', quadro:'Quadro', album:'Álbum',
+  caixa_estojo_pendrive:'Caixa/estojo pendrive', caixa_estojo_luva_album:'Caixa/luva álbum',
+  acessorio:'Acessório', outro:'Outro'
+};
+
+async function carregarCatalogoProdutos(){
+  const produtos = await sb('produtos?select=id,categoria,nome,produto_variacoes(id,tamanho,preco,estoque)&order=nome.asc');
+  const tbody = document.getElementById('tbl-produtos');
+  if(!produtos.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum produto ainda.</td></tr>'; return; }
+  const linhas = [];
+  produtos.forEach(p => {
+    if(!p.produto_variacoes.length){
+      linhas.push(`
+        <tr>
+          <td>${CATEGORIA_LABEL[p.categoria]||p.categoria}</td>
+          <td class="nome">${p.nome}</td>
+          <td colspan="3" style="color:var(--ink3)">sem variação cadastrada</td>
+          <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="abrirNovaVariacao('${p.id}','${p.nome.replace(/'/g,"\\'")}')">Adicionar variação</button></td>
+        </tr>
+      `);
+      return;
+    }
+    p.produto_variacoes.forEach((v, i) => {
+      linhas.push(`
+        <tr>
+          ${i===0 ? `<td rowspan="${p.produto_variacoes.length}">${CATEGORIA_LABEL[p.categoria]||p.categoria}</td><td class="nome" rowspan="${p.produto_variacoes.length}">${p.nome}</td>` : ''}
+          <td>${v.tamanho||'—'}</td>
+          <td><input type="number" value="${v.preco}" id="vp-${v.id}" style="width:90px;padding:6px 8px"></td>
+          <td><input type="number" value="${v.estoque}" id="ve-${v.id}" style="width:70px;padding:6px 8px"></td>
+          <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="salvarVariacao('${v.id}')">Salvar</button></td>
+        </tr>
+      `);
+    });
+  });
+  tbody.innerHTML = linhas.join('');
+}
+
+let novaVariacaoCtx = null;
+
+function abrirNovaVariacao(produtoId, nomeProduto){
+  novaVariacaoCtx = {produtoId};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Nova variação</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:16px">Produto: <b style="color:var(--ink)">${nomeProduto}</b></p>
+    <input id="sh-var-tamanho" placeholder="Tamanho (opcional)" style="width:100%;margin-bottom:10px">
+    <input id="sh-var-preco" type="number" placeholder="Preço" style="width:100%;margin-bottom:10px">
+    <input id="sh-var-estoque" type="number" placeholder="Estoque" value="0" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarNovaVariacao()">Salvar variação</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarNovaVariacao(){
+  const tamanho = document.getElementById('sh-var-tamanho').value.trim();
+  const preco = Number(document.getElementById('sh-var-preco').value);
+  const estoque = Number(document.getElementById('sh-var-estoque').value) || 0;
+  const {produtoId} = novaVariacaoCtx;
+
+  if(!preco){ toast('Informe o preço', true); return; }
+
+  try{
+    await sb('produto_variacoes', {method:'POST', body: JSON.stringify({
+      produto_id: produtoId, tamanho: tamanho || null, preco, estoque
+    }), prefer:'return=minimal'});
+    toast('Variação criada');
+    fecharSheet();
+    await carregarCatalogoProdutos();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function salvarVariacao(id){
+  const preco = Number(document.getElementById(`vp-${id}`).value);
+  const estoque = Number(document.getElementById(`ve-${id}`).value);
+  try{
+    await sb(`produto_variacoes?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({preco, estoque}), prefer:'return=minimal'});
+    toast('Produto atualizado');
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function criarProduto(){
+  const categoria = document.getElementById('p-categoria').value;
+  const nome = document.getElementById('p-nome').value.trim();
+  const tamanho = document.getElementById('p-tamanho').value.trim();
+  const preco = Number(document.getElementById('p-preco').value);
+
+  if(!nome || !preco){ toast('Preencha nome e preço', true); return; }
+
+  try{
+    const produto = await sb('produtos', {method:'POST', body: JSON.stringify({categoria, nome})});
+    await sb('produto_variacoes', {method:'POST', body: JSON.stringify({
+      produto_id: produto[0].id, tamanho: tamanho || null, preco, estoque: 0
+    }), prefer:'return=minimal'});
+    toast('Produto adicionado');
+    document.getElementById('p-nome').value = '';
+    document.getElementById('p-tamanho').value = '';
+    document.getElementById('p-preco').value = '';
+    await carregarCatalogoProdutos();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+function abrirConverter(leadId, personId, nichoId, nome){
+  converterCtx = {leadId, personId, nichoId};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Converter em oportunidade</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:16px">Lead: <b style="color:var(--ink)">${nome}</b></p>
+    <input id="sh-valor" type="number" placeholder="Valor estimado (R$)" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarConverter()">Criar oportunidade</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarConverter(){
+  const valor = document.getElementById('sh-valor').value;
+  const {leadId, personId, nichoId} = converterCtx;
+  try{
+    await sb('opportunities', {method:'POST', body: JSON.stringify({
+      lead_id: leadId, person_id: personId, nicho_id: nichoId || null,
+      valor_estimado: valor ? Number(valor) : null, status: 'aberta'
+    })});
+    await sb(`leads?id=eq.${leadId}`, {method:'PATCH', body: JSON.stringify({status:'convertido'}), prefer:'return=minimal'});
+    toast('Oportunidade criada');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarLeads(), carregarOportunidades()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function carregarProjetos(){
+  if(!window._stagesCache){
+    window._stagesCache = await sb('project_stage_defs?select=*&order=ordem.asc');
+    window._transCache = await sb('project_state_transitions?select=from_stage_id,to_stage_id');
+  }
+  const stages = window._stagesCache;
+  const trans = window._transCache;
+
+  const projetos = await sb('projects?select=id,titulo,valor_total,client_id,current_stage_id,clients(persons(name)),project_stage_defs(nome,cor)&order=created_at.desc&limit=10');
+  const tbody = document.getElementById('tbl-projetos');
+  if(!projetos.length){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum projeto ainda. Feche uma oportunidade acima.</td></tr>';
+    return;
+  }
+  const linhas = await Promise.all(projetos.map(async p => {
+    const contratos = await sb(`contracts?project_id=eq.${p.id}&select=id,numero`);
+    let financeiroHtml;
+    if(!contratos.length){
+      financeiroHtml = `<button class="primary" style="padding:6px 12px;font-size:11px" onclick="abrirContrato('${p.id}','${p.valor_total}')">Criar contrato</button>`;
+    }else{
+      const parcelas = await sb(`contract_installments?contract_id=eq.${contratos[0].id}&select=id,numero_parcela,valor,status&order=numero_parcela.asc`);
+      financeiroHtml = parcelas.map(pc => `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="badge ${pc.status==='pago'?'novo':''}" style="font-size:10px">#${pc.numero_parcela} · R$ ${Number(pc.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})} · ${pc.status}</span>
+          ${pc.status!=='pago' ? `<button class="primary" style="padding:3px 8px;font-size:10px" onclick="abrirPagamento('${pc.id}','${pc.valor}')">Pagar</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    const proximasEtapas = trans.filter(t => t.from_stage_id === p.current_stage_id)
+      .map(t => stages.find(s => s.id === t.to_stage_id))
+      .filter(Boolean)
+      .sort((a,b)=>a.ordem-b.ordem);
+
+    const cor = p.project_stage_defs?.cor || '#8A8A93';
+    const etapaHtml = `
+      <div style="margin-bottom:6px"><span class="badge" style="border:1px solid ${cor}55;color:${cor}">${p.project_stage_defs?.nome || '—'}</span></div>
+      ${proximasEtapas.length ? `
+        <select onchange="if(this.value) moverEtapa('${p.id}', this.value)" style="font-size:11px;padding:5px 8px">
+          <option value="">Mover para…</option>
+          ${proximasEtapas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('')}
+        </select>
+      ` : '<span style="font-size:11px;color:var(--ink3)">etapa final</span>'}
+    `;
+
+    return `
+      <tr>
+        <td class="nome">${p.clients?.persons?.name || '—'}</td>
+        <td>${p.titulo}</td>
+        <td>R$ ${Number(p.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+        <td>${etapaHtml}</td>
+        <td>${financeiroHtml}</td>
+        <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="abrirPortal('${p.id}')">Ver portal</button></td>
+      </tr>
+    `;
+  }));
+  tbody.innerHTML = linhas.join('');
+}
+
+async function moverEtapa(projectId, novoStageId){
+  try{
+    await sb(`projects?id=eq.${projectId}`, {method:'PATCH', body: JSON.stringify({current_stage_id: novoStageId}), prefer:'return=minimal'});
+    toast('Etapa atualizada');
+    await carregarProjetos();
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+let contratoCtx = null;
+
+function abrirContrato(projectId, valorTotal){
+  contratoCtx = {projectId, valorTotal};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Criar contrato</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:16px">Valor total: <b style="color:var(--ink)">R$ ${Number(valorTotal).toLocaleString('pt-BR',{minimumFractionDigits:2})}</b></p>
+    <input id="sh-parcelas" type="number" min="1" max="12" value="1" placeholder="Número de parcelas" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarContrato()">Gerar contrato e parcelas</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarContrato(){
+  const nParcelas = Math.max(1, parseInt(document.getElementById('sh-parcelas').value) || 1);
+  const {projectId, valorTotal} = contratoCtx;
+  try{
+    const numero = 'CT-' + Date.now();
+    const contrato = await sb('contracts', {method:'POST', body: JSON.stringify({
+      project_id: projectId, client_id: await clientIdDoProjeto(projectId),
+      numero, valor_total: valorTotal, status: 'assinado', assinado_em: new Date().toISOString()
+    })});
+    const contractId = contrato[0].id;
+
+    const valorParcela = Math.floor((valorTotal / nParcelas) * 100) / 100;
+    let somaAcumulada = 0;
+    for(let i = 1; i <= nParcelas; i++){
+      const isUltima = i === nParcelas;
+      const valor = isUltima ? (valorTotal - somaAcumulada) : valorParcela;
+      somaAcumulada += valor;
+      const vencimento = new Date(Date.now() + (i-1)*30*24*3600*1000).toISOString().slice(0,10);
+      await sb('contract_installments', {method:'POST', body: JSON.stringify({
+        contract_id: contractId, numero_parcela: i, valor: Number(valor.toFixed(2)), vencimento
+      }), prefer:'return=minimal'});
+    }
+
+    toast('Contrato criado com ' + nParcelas + ' parcela(s)');
+    fecharSheet();
+    await carregarProjetos();
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function clientIdDoProjeto(projectId){
+  const p = await sb(`projects?id=eq.${projectId}&select=client_id`);
+  return p[0].client_id;
+}
+
+let pagamentoCtx = null;
+
+function abrirPagamento(installmentId, valor){
+  pagamentoCtx = {installmentId};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Registrar pagamento</h3>
+    <input id="sh-valor-pago" type="number" value="${valor}" placeholder="Valor pago (R$)" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarPagamento()">Confirmar pagamento</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarPagamento(){
+  const valor = Number(document.getElementById('sh-valor-pago').value);
+  const {installmentId} = pagamentoCtx;
+  try{
+    await sb('payments', {method:'POST', body: JSON.stringify({
+      contract_installment_id: installmentId, valor_pago: valor
+    }), prefer:'return=minimal'});
+    toast('Pagamento registrado');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarProjetos()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function fecharOportunidade(oppId, personId, nichoId){
+  try{
+    const stageId = stages[0].id;
+
+    const opp = await sb(`opportunities?id=eq.${oppId}&select=valor_estimado`);
+    const valor = opp[0]?.valor_estimado || 0;
+
+    await sb(`opportunities?id=eq.${oppId}`, {method:'PATCH', body: JSON.stringify({status:'ganha', ganho_em: new Date().toISOString()}), prefer:'return=minimal'});
+
+    const cliente = await sb('clients', {method:'POST', body: JSON.stringify({person_id: personId, opportunity_id: oppId})});
+    const clientId = cliente[0].id;
+
+    const pessoa = await sb(`persons?id=eq.${personId}&select=name`);
+    const nichoInfo = nichoId ? await sb(`nichos?id=eq.${nichoId}&select=nome`) : null;
+    const titulo = `${nichoInfo?.[0]?.nome || 'Projeto'} — ${pessoa[0]?.name || 'Cliente'}`;
+
+    await sb('projects', {method:'POST', body: JSON.stringify({
+      client_id: clientId, opportunity_id: oppId, nicho_id: nichoId || null,
+      titulo, valor_total: valor, current_stage_id: stageId
+    })});
+
+    toast('Fechado! Cliente e projeto criados.');
+    await Promise.all([carregarCards(), carregarOportunidades(), carregarProjetos()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function criarLead(){
+  const nome = document.getElementById('f-nome').value.trim();
+  const tel = document.getElementById('f-tel').value.trim();
+  const nichoId = document.getElementById('f-nicho').value;
+  const btn = document.getElementById('f-btn');
+
+  if(!nome){ toast('Digite o nome', true); return; }
+
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try{
+    const pessoa = await sb('persons', {method:'POST', body: JSON.stringify({name: nome, phone: tel || null})});
+    const person_id = pessoa[0].id;
+
+    await sb('leads', {method:'POST', body: JSON.stringify({
+      person_id, nicho_id: nichoId || null, status: 'novo'
+    })});
+
+    toast('Lead adicionado com sucesso');
+    document.getElementById('f-nome').value = '';
+    document.getElementById('f-tel').value = '';
+    document.getElementById('f-nicho').value = '';
+    await Promise.all([carregarCards(), carregarLeads()]);
+  }catch(e){
+    toast('Erro ao salvar: ' + e.message, true);
+  }finally{
+    btn.disabled = false; btn.textContent = 'Adicionar';
+  }
+}
+
+function verVersoes(){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Histórico de versões</h3>
+    <div class="v"><b>v2.3.0</b> — 30 ago 2026<br><b>Tipografia e botão base trocados de verdade:</b> Cormorant Garamond + Montserrat (a mesma desde a v1.0) virou Space Grotesk + Inter, com títulos maiúsculos e espaçados. O botão principal, usado em quase todo canto do app (Salvar, Adicionar, Pagar), deixou de ser arredondado com gradiente — agora é sólido, reto, letras espaçadas. Cantos arredondados removidos de cards, inputs, seções e badges. Fundo neutro recalibrado.</div>
+    <div class="v"><b>v2.2.0</b> — 30 ago 2026<br><b>Cor trocada de verdade:</b> extraí a cor exata das suas referências com código (não no olho) — o dourado acinzentado do vaso de luxo (~#C8A070), não mais aquele amarelo saturado de ícone de app. Traço "—" antes dos rótulos e numeração "02/06" na navegação, como na referência da bicicleta Peugeot.</div>
+    <div class="v"><b>v2.1.0</b> — 30 ago 2026<br><b>Redesign de verdade:</b> banner deixou de ser bloco de cor sólida (agora escuro, com destaque dourado em linha fina e brilho pontual). Botões trocados por contorno fino com letras espaçadas. Grade de navegação sem sombra genérica, com divisórias finas. Menu virou painel deslizante com fundo escurecido (não mais uma caixa flutuando torta). Login com fundo texturizado e cartão translúcido. Textura de grão sutil em toda a interface.</div>
+    <div class="v"><b>v2.0.0</b> — 30 ago 2026<br><b>Telas separadas:</b> a Central deixou de ser uma página rolando infinita. Agora é 6 telas — Central, Leads, Oportunidades, Projetos, Catálogo, Agenda — cada uma com cabeçalho editorial (rótulo, título grande, linha dourada) e navegação com setas entre elas, como uma apresentação.</div>
+    <div class="v"><b>v1.9.0</b> — 30 ago 2026<br><b>Redesign da Central:</b> saudação por horário, banner âmbar com os números do negócio, ações rápidas em pílula (Novo lead, Agendar, Backup) e grade de navegação por ícones — sem mexer em nenhuma lógica de dados por baixo.</div>
+    <div class="v"><b>v1.8.0</b> — 30 ago 2026<br><b>Backup, visual e responsivo:</b> botão de exportar backup completo em JSON (o Supabase gratuito não faz backup automático — esse é o seu). Menu de navegação com ícones, virando barra lateral fixa em telas de computador/tablet. Ícones em todas as seções.</div>
+    <div class="v"><b>v1.7.0</b> — 30 ago 2026<br><b>Segurança:</b> ativado login obrigatório. As 60 tabelas agora exigem autenticação (RLS ativo no banco) — ninguém mais acessa os dados sem entrar com e-mail e senha.</div>
+    <div class="v"><b>v1.6.0</b> — 30 ago 2026<br>Agenda: marcar sessões, reuniões e entregas por projeto, com data e local. Marcar como realizado ou cancelar direto na lista. Card "Sessões (7 dias)" agora reflete a agenda real.</div>
+    <div class="v"><b>v1.5.1</b> — 30 ago 2026<br><b>Correção:</b> "Ver portal" abria um arquivo separado que não funciona no Android ao abrir da pasta Downloads (limitação do sistema, não do app). Agora o portal abre dentro da própria Central, em tela cheia.</div>
+    <div class="v"><b>v1.5.0</b> — 30 ago 2026<br><b>Correção importante:</b> a seção Projetos tinha sumido da tela na v1.4.0 (bug meu, restaurada agora). Adicionado link "Ver portal" em cada projeto, abrindo a visão do cliente.</div>
+    <div class="v"><b>v1.4.1</b> — 30 ago 2026<br>Correção: produtos sem variação cadastrada (ex: Porta-retrato Digital) agora têm botão "Adicionar variação" em vez de ficar travado com traço.</div>
+    <div class="v"><b>v1.4.0</b> — 30 ago 2026<br>Catálogo: editar preços de serviços e produtos existentes, e cadastrar novos produtos com preço e estoque.</div>
+    <div class="v"><b>v1.3.0</b> — 30 ago 2026<br>Kanban: mover projeto pelas etapas, respeitando a máquina de estados (só mostra as próximas etapas realmente permitidas).</div>
+    <div class="v"><b>v1.2.0</b> — 30 ago 2026<br>Financeiro: criar contrato com parcelas a partir de um projeto, e registrar pagamentos. Parcela quitada muda de status sozinha.</div>
+    <div class="v"><b>v1.1.0</b> — 30 ago 2026<br>Funil completo: converter lead em oportunidade, e fechar oportunidade gerando cliente + projeto automaticamente.</div>
+    <div class="v"><b>v1.0.0</b> — 30 ago 2026<br>Primeira tela conectada de verdade ao banco Supabase. Cadastro de lead e visão geral com dados ao vivo.</div>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+function fecharSheet(){ document.getElementById('sheet').classList.remove('on'); }
+
+async function abrirPortal(projectId){
+  document.getElementById('portal-overlay').style.display = 'block';
+  const content = document.getElementById('portal-content');
+  content.innerHTML = '<div class="empty">carregando…</div>';
+
+  try{
+    const [projetos, todasEtapas] = await Promise.all([
+      sb(`projects?id=eq.${projectId}&select=titulo,valor_total,current_stage_id,clients(persons(name)),project_stage_defs(slug,ordem)`),
+      sb('project_stage_defs?select=slug,nome,ordem,is_terminal&order=ordem.asc')
+    ]);
+    const p = projetos[0];
+    const nomeCliente = p.clients?.persons?.name || 'Cliente';
+    const etapaAtualOrdem = p.project_stage_defs?.ordem || 0;
+    const etapasVisiveis = todasEtapas.filter(e => e.slug !== 'cancelado');
+
+    const contratos = await sb(`contracts?project_id=eq.${projectId}&select=id,valor_total`);
+    let financeiroHtml = '<p style="color:var(--ink3);font-size:13px">Ainda não há contrato registrado.</p>';
+    if(contratos.length){
+      const parcelas = await sb(`contract_installments?contract_id=eq.${contratos[0].id}&select=numero_parcela,valor,status,vencimento&order=numero_parcela.asc`);
+      const pago = parcelas.filter(pc=>pc.status==='pago').reduce((s,pc)=>s+Number(pc.valor),0);
+      const total = Number(contratos[0].valor_total);
+      financeiroHtml = `
+        <div class="row"><span class="l">Valor total</span><span class="v">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+        <div class="row"><span class="l">Já pago</span><span class="v" style="color:var(--ok)">R$ ${pago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+        <div class="row"><span class="l">Falta pagar</span><span class="v" style="color:var(--am)">R$ ${(total-pago).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+      ` + parcelas.map(pc => `
+        <div class="row">
+          <span class="l">Parcela ${pc.numero_parcela} · vence ${new Date(pc.vencimento+'T12:00:00').toLocaleDateString('pt-BR')}</span>
+          <span class="v" style="color:${pc.status==='pago'?'var(--ok)':'var(--am)'}">${pc.status==='pago' ? 'Pago' : 'R$ '+Number(pc.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+        </div>
+      `).join('');
+    }
+
+    content.innerHTML = `
+      <div class="hero" style="text-align:center;margin-bottom:16px">
+        <p style="color:var(--ink2);font-size:13px;margin:0">Visão do cliente</p>
+        <h2 style="font-size:26px;margin:4px 0">${nomeCliente}</h2>
+        <p style="color:var(--ink2);font-size:14px;margin:0">${p.titulo}</p>
+      </div>
+      <section>
+        <h3 style="margin-bottom:14px">Onde está o projeto</h3>
+        <div class="steps">
+          ${etapasVisiveis.map(e => {
+            const cls = e.ordem < etapaAtualOrdem ? 'done' : (e.ordem === etapaAtualOrdem ? 'current' : '');
+            return `<div class="step ${cls}"><div class="line"></div><div class="dot">${cls==='done'?'✓':''}</div><div class="label">${e.nome}</div></div>`;
+          }).join('')}
+        </div>
+      </section>
+      <section>
+        <h3 style="margin-bottom:14px">Financeiro</h3>
+        ${financeiroHtml}
+      </section>
+    `;
+  }catch(e){
+    content.innerHTML = `<div class="empty">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function fecharPortal(){ document.getElementById('portal-overlay').style.display = 'none'; }
+
+function toggleFabMenu(){
+  const aberto = document.getElementById('nav-backdrop').classList.toggle('on');
+  document.getElementById('fab-toggle').innerHTML = aberto
+    ? '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+}
+
+function irPara(id){
+  document.getElementById('nav-backdrop')?.classList.remove('on');
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function mostrarView(nome){
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  const alvo = document.getElementById(`view-${nome}`);
+  if(alvo) alvo.style.display = 'block';
+  const backdrop = document.getElementById('nav-backdrop');
+  if(backdrop?.classList.contains('on')){
+    backdrop.classList.remove('on');
+    document.getElementById('fab-toggle').innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+  }
+  document.getElementById('app').scrollTo({top:0, behavior:'instant'});
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+async function exportarBackup(){
+  toggleFabMenu();
+  toast('Preparando backup…');
+  try{
+    const tabelas = ['persons','leads','opportunities','clients','projects','project_stage_history',
+      'contracts','contract_installments','payments','nichos','servicos','pacotes','pacote_itens',
+      'produtos','produto_variacoes','agenda_events'];
+    const dados = {};
+    for(const t of tabelas){
+      dados[t] = await sb(`${t}?select=*`);
+    }
+    dados._exportado_em = new Date().toISOString();
+    dados._sistema = 'Lumiar OS · Backup manual';
+
+    const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dataStr = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `lumiar-backup-${dataStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Backup baixado com sucesso');
+  }catch(e){
+    toast('Erro ao gerar backup: ' + e.message, true);
+  }
+}
+
+async function carregarAgendaProjetos(){
+  const projetos = await sb('projects?select=id,titulo,clients(persons(name))&status=not.in.(concluido,cancelado)&order=created_at.desc');
+  const sel = document.getElementById('ag-projeto');
+  sel.innerHTML = '<option value="">Projeto…</option>' + projetos.map(p =>
+    `<option value="${p.id}">${p.clients?.persons?.name || '—'} · ${p.titulo}</option>`
+  ).join('');
+}
+
+async function criarEvento(){
+  const projectId = document.getElementById('ag-projeto').value;
+  const tipo = document.getElementById('ag-tipo').value;
+  const data = document.getElementById('ag-data').value;
+  const local = document.getElementById('ag-local').value.trim();
+
+  if(!projectId || !data){ toast('Escolha o projeto e a data', true); return; }
+
+  try{
+    const projInfo = await sb(`projects?id=eq.${projectId}&select=titulo,clients(persons(name))`);
+    const titulo = `${TIPO_LABEL[tipo]} — ${projInfo[0]?.clients?.persons?.name || projInfo[0]?.titulo}`;
+
+    await sb('agenda_events', {method:'POST', body: JSON.stringify({
+      project_id: projectId, tipo, titulo, local: local || null,
+      inicio: new Date(data).toISOString()
+    }), prefer:'return=minimal'});
+
+    toast('Evento agendado');
+    document.getElementById('ag-data').value = '';
+    document.getElementById('ag-local').value = '';
+    await Promise.all([carregarCards(), carregarAgenda()]);
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+const TIPO_LABEL = {sessao:'Sessão', reuniao:'Reunião', entrega:'Entrega', revelacao:'Revelação', outro:'Evento'};
+
+async function carregarAgenda(){
+  const eventos = await sb('agenda_events?select=id,tipo,titulo,local,inicio,status&order=inicio.asc&limit=15');
+  const tbody = document.getElementById('tbl-agenda');
+  if(!eventos.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum evento agendado ainda.</td></tr>'; return; }
+  tbody.innerHTML = eventos.map(e => `
+    <tr>
+      <td>${fmtData(e.inicio)}</td>
+      <td class="nome">${e.titulo}</td>
+      <td>${TIPO_LABEL[e.tipo]||e.tipo}</td>
+      <td>${e.local||'—'}</td>
+      <td><span class="badge ${e.status==='realizado'?'novo':''}">${e.status}</span></td>
+      <td>${e.status==='agendado'||e.status==='confirmado' ? `
+        <button class="primary" style="padding:5px 10px;font-size:10px" onclick="mudarStatusEvento('${e.id}','realizado')">Realizado</button>
+        <button class="primary" style="padding:5px 10px;font-size:10px;background:var(--panel2);color:var(--ink2)" onclick="mudarStatusEvento('${e.id}','cancelado')">Cancelar</button>
+      ` : ''}</td>
+    </tr>
+  `).join('');
+}
+
+async function mudarStatusEvento(id, status){
+  try{
+    await sb(`agenda_events?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({status}), prefer:'return=minimal'});
+    toast('Status atualizado');
+    await Promise.all([carregarCards(), carregarAgenda()]);
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+function definirSaudacao(){
+  const h = new Date().getHours();
+  const texto = h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  const el = document.getElementById('greet');
+  if(el) el.textContent = texto;
+}
+
+async function iniciarApp(){
+  definirSaudacao();
+  try{
+    await carregarNichos();
+    await Promise.all([carregarCards(), carregarLeads(), carregarOportunidades(), carregarProjetos(), carregarCatalogoServicos(), carregarCatalogoProdutos(), carregarAgendaProjetos(), carregarAgenda()]);
+  }catch(e){
+    toast('Erro ao conectar: ' + e.message, true);
+  }
+}
+
+(async function boot(){
+  const temSessao = await tentarRestaurarSessao();
+  if(temSessao){
+    entrarNoApp();
+  }
+  // se não tem sessão, a tela de login (que já começa visível) permanece
+})();
+</script>
+</body>
+</html>
