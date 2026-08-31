@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lumiar · Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0F0F0F; --bg:#1A1A1A; --panel:#242424; --panel2:#1E1E1E;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.035); --gl:rgba(232,163,61,.18);
+  --ink:#F2EFEA; --ink2:#8a8a8a; --ink3:#6e6e6e;
+  --am:#E8A33D; --am2:#A8763A; --ami:#1A1305; --amlight:#F2BE70; --amdark:#5c4a2e; --retomar:#D2703A;
+  --ok:#7FB069; --warn:#F97316; --err:#F87171;
+  --s1:0 1px 2px rgba(0,0,0,.6); --s2:0 8px 22px rgba(0,0,0,.45); --s3:0 28px 64px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--void);overflow-x:hidden;max-width:100vw;}
+body{color:var(--ink);font-family:"Montserrat",system-ui,sans-serif;font-weight:300;
+  font-variant-numeric:tabular-nums;min-height:100vh;position:relative;
+  background:
+    radial-gradient(900px 500px at 15% -8%, rgba(232,163,61,.10), transparent 55%),
+    radial-gradient(700px 800px at 100% 40%, rgba(232,163,61,.04), transparent 60%),
+    var(--void);}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+#login-screen, .wrap, .fab-nav, .sh, #portal-overlay, footer{position:relative;z-index:2;}
+button,input,select{font-family:inherit;}
+h1,h2,h3{font-family:"Cormorant Garamond",serif;font-weight:500;margin:0;}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 100px;transition:margin-left .2s;}
+header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:8px;}
+header h1{font-size:30px;color:var(--ink);}
+header h1 em{color:var(--am);font-style:normal;}
+.status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);}
+
+.icn{width:19px;height:19px;stroke:var(--am);stroke-width:1.6;fill:none;vertical-align:-4px;margin-right:9px;}
+h2{display:flex;align-items:center;font-size:19px;font-weight:400;color:var(--ink);}
+
+/* ===== navegação: botão flutuante + painel deslizante com fundo escurecido ===== */
+.fab-btn{position:fixed;left:20px;bottom:24px;z-index:160;width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(180deg,var(--am),var(--am2));border:none;box-shadow:var(--s3),0 0 24px rgba(232,163,61,.25);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;}
+.fab-btn:active{transform:scale(.92);}
+.fab-btn svg{width:22px;height:22px;stroke:var(--ami);stroke-width:2;fill:none;}
+
+.nav-backdrop{position:fixed;inset:0;background:rgba(6,6,7,.7);backdrop-filter:blur(6px);z-index:150;
+  display:flex;justify-content:flex-start;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.nav-backdrop.on{opacity:1;pointer-events:auto;}
+.fab-menu{width:min(300px,82vw);height:100%;background:var(--bg);border-right:1px solid var(--line);
+  padding:32px 22px;display:flex;flex-direction:column;gap:2px;transform:translateX(-100%);
+  transition:transform .28s cubic-bezier(.22,1,.36,1);overflow-y:auto;}
+.nav-backdrop.on .fab-menu{transform:translateX(0);}
+.fab-menu .brand-side{font-family:"Cormorant Garamond",serif;font-size:21px;color:var(--ink);margin-bottom:8px;}
+.fab-menu .brand-side em{color:var(--am);font-style:normal;}
+.fab-menu-rule{width:32px;height:1px;background:var(--am);margin-bottom:22px;}
+.fab-menu button{background:none;border:none;color:var(--ink2);text-align:left;padding:12px 10px;
+  font-size:13px;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;}
+.fab-menu button:hover{background:rgba(232,163,61,.06);color:var(--ink);}
+.fab-menu button svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.4;fill:none;flex-shrink:0;}
+.fab-menu hr{border:none;border-top:1px solid var(--line2);margin:10px 0;}
+
+@media(min-width:960px){
+  body{padding-left:220px;}
+  .fab-btn{display:none;}
+  .nav-backdrop{position:fixed;inset:0 auto 0 0;width:220px;background:none;backdrop-filter:none;
+    opacity:1;pointer-events:auto;justify-content:flex-start;}
+  .fab-menu{width:100%;transform:none;border-left:none;border-right:1px solid var(--line);padding:28px 16px;}
+  .wrap{max-width:900px;margin:0;padding:32px 40px 100px;}
+}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:32px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--s1);}
+.card .n{font-size:32px;color:var(--ink);font-family:"Cormorant Garamond",serif;}
+.card .l{font-size:12px;color:var(--ink2);margin-top:2px;}
+.card.warn .n{color:var(--warn);}
+
+/* ===== hero / saudação ===== */
+.hero-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.brand-mark{width:44px;height:44px;border-radius:14px;flex-shrink:0;background:var(--am);
+  color:var(--ami);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--s2);}
+.greet{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;}
+.hero-header h1{font-size:26px;font-weight:400;}
+.hero-header h1 em{color:var(--am);font-style:normal;}
+
+/* ===== banner — escuro dominante, dourado como acento fino, não bloco de cor ===== */
+.hero-panel{position:relative;background:#242424;border:1px solid rgba(232,163,61,.14);
+  border-radius:20px;padding:26px 24px 22px;margin-bottom:18px;box-shadow:var(--s3);overflow:hidden;}
+.hero-panel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--am),transparent);}
+.hero-panel::after{content:'';position:absolute;right:-60px;top:-80px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,163,61,.16),transparent 70%);pointer-events:none;}
+.hp-top{display:flex;align-items:center;gap:16px;margin-bottom:22px;position:relative;}
+.hp-icon{width:38px;height:38px;border:1px solid rgba(232,163,61,.35);border-radius:12px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;background:rgba(232,163,61,.06);}
+.hp-icon svg{width:17px;height:17px;stroke:var(--am);stroke-width:1.4;fill:none;}
+.hp-eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--am);opacity:.9;margin-bottom:5px;}
+.hp-title{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:500;line-height:1.3;color:var(--ink);}
+.hp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid rgba(232,163,61,.14);
+  padding-top:16px;position:relative;}
+.hp-stat{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:6px 10px 20px;
+  border-left:1px solid rgba(232,163,61,.1);}
+.hp-stat:nth-child(3n+1){border-left:none;}
+.hp-stat svg{width:14px;height:14px;stroke:var(--am);stroke-width:1.3;fill:none;opacity:.65;}
+.hp-stat .n{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:500;color:var(--ink);letter-spacing:-.01em;}
+.hp-stat .l{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);}
+.hp-stat.warn .n{color:var(--warn);}
+.hp-stat.warn svg{stroke:var(--warn);}
+
+/* ===== pílulas de ação rápida — contorno fino, tipografia versalete ===== */
+.pill-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:24px;}
+.pill{flex-shrink:0;display:flex;align-items:center;gap:9px;background:transparent;border:1px solid rgba(232,163,61,.4);
+  color:var(--ink);border-radius:100px;padding:12px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+  cursor:pointer;transition:all .18s;}
+.pill:active{transform:scale(.96);background:rgba(232,163,61,.08);}
+.pill:hover{border-color:var(--am);}
+.pill svg{width:14px;height:14px;stroke:var(--am);stroke-width:1.6;fill:none;}
+
+/* ===== grade de navegação — arquitetônica, sem sombra suave genérica ===== */
+.nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:30px;}
+.nav-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:transform .15s,border-color .15s;}
+.nav-card:active{transform:scale(.97);}
+.nav-card:hover{border-color:rgba(232,163,61,.3);}
+.nav-card:hover .nc-icon svg{stroke:var(--am);}
+.nc-icon{width:36px;height:36px;background:var(--panel2);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.nc-icon svg{width:20px;height:20px;stroke:var(--ink2);stroke-width:1.3;fill:none;transition:stroke .18s;}
+.nc-title{font-family:"Cormorant Garamond",serif;font-size:19px;color:var(--ink);margin-bottom:3px;}
+.nc-sub{font-size:10.5px;color:var(--ink3);letter-spacing:.03em;line-height:1.4;text-transform:uppercase;}
+@media(min-width:640px){ .nav-grid{grid-template-columns:repeat(3,1fr);} }
+@media(min-width:960px){ .nav-grid{grid-template-columns:repeat(3,1fr);} .hp-stats{grid-template-columns:repeat(6,1fr);} }
+
+/* ===== telas separadas por tópico ===== */
+.view{animation:fade .3s ease;}
+.view-head{margin-bottom:26px;}
+.back-btn{background:none;border:none;color:var(--ink3);font-size:12px;display:flex;align-items:center;gap:4px;
+  cursor:pointer;padding:0;margin-bottom:18px;}
+.back-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+.view-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--am);margin-bottom:4px;}
+.view-title{font-size:32px;color:var(--ink);font-weight:400;}
+.view-rule{width:44px;height:2px;background:linear-gradient(90deg,var(--am),transparent);margin-top:14px;}
+
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:18px;
+  border-top:1px solid var(--line);}
+.pager-idx{font-size:10.5px;letter-spacing:.12em;color:var(--ink3);font-variant-numeric:tabular-nums;}
+.pager button{background:none;border:none;color:var(--ink3);font-size:12px;display:flex;align-items:center;
+  gap:6px;cursor:pointer;padding:8px 4px;text-transform:uppercase;letter-spacing:.06em;}
+.pager button.next{color:var(--am);}
+.pager svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+.pager button:hover{color:var(--ink);}
+.pager button.next:hover{color:var(--am2);}
+
+section{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;margin-bottom:20px;box-shadow:var(--s2);}
+section h2{font-size:20px;margin-bottom:16px;color:var(--ink);}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;}
+@media(max-width:640px){.form-row{grid-template-columns:1fr;}}
+input,select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:12px;
+  padding:11px 13px;font-size:14px;outline:none;}
+input:focus,select:focus{border-color:var(--am);}
+input::placeholder{color:var(--ink3);}
+button.primary{background:var(--am);color:var(--ami);border:none;text-transform:uppercase;letter-spacing:.12em;
+  border-radius:100px;padding:11px 20px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;}
+button.primary:active{transform:scale(.96);}
+button.primary:hover{background:var(--am2);}
+button.primary:disabled{opacity:.5;cursor:default;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+.table-scroll{overflow-x:auto;margin:0 -22px;padding:0 22px;-webkit-overflow-scrolling:touch;}
+.table-scroll table{min-width:520px;}
+th{text-align:left;color:var(--ink3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+  padding:8px 10px;border-bottom:1px solid var(--line);}
+td{padding:10px;border-bottom:1px solid var(--line2);color:var(--ink2);}
+tr:last-child td{border-bottom:none;}
+td.nome{color:var(--ink);}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;background:var(--panel2);color:var(--ink2);}
+.badge.novo{color:var(--am);background:rgba(232,163,61,.12);}
+.empty{color:var(--ink3);font-size:13px;padding:20px 0;text-align:center;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--panel2);border:1px solid var(--line);padding:12px 20px;border-radius:100px;font-size:13px;
+  box-shadow:var(--s3);transition:all .3s;pointer-events:none;z-index:99;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,11,.9);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:10px 20px;display:flex;justify-content:space-between;
+  align-items:center;font-size:11px;color:var(--ink3);}
+footer button{background:none;border:none;color:var(--ink3);font-size:11px;cursor:pointer;text-decoration:underline;}
+.sh{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:100;}
+.sh.on{display:flex;}
+.sh .pn{background:var(--panel);width:100%;max-width:480px;margin:0 auto;border-radius:20px 20px 0 0;
+  padding:24px;max-height:70vh;overflow-y:auto;box-shadow:var(--s3);}
+.sh .pn h3{margin-bottom:14px;}
+.sh .pn .v{padding:10px 0;border-bottom:1px solid var(--line2);font-size:13px;color:var(--ink2);}
+.sh .pn .v b{color:var(--ink);}
+
+.login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(700px 900px at 78% 15%, rgba(232,163,61,.14), transparent 55%),
+    radial-gradient(500px 500px at 10% 90%, rgba(232,163,61,.05), transparent 60%),
+    var(--void);
+  z-index:300;padding:20px;}
+.login-box{width:100%;max-width:380px;background:rgba(20,20,22,.55);backdrop-filter:blur(14px);
+  border:1px solid rgba(232,163,61,.22);border-radius:4px;padding:44px 32px 36px;box-shadow:var(--s3);text-align:center;}
+.login-box .mark{font-size:10.5px;letter-spacing:.24em;color:var(--am);text-transform:uppercase;margin-bottom:10px;}
+.login-box h1{font-size:30px;margin-bottom:8px;color:var(--ink);font-weight:400;}
+.login-box .rule{width:36px;height:1px;background:var(--am);margin:0 auto 24px;}
+.login-box input{width:100%;margin-bottom:10px;text-align:left;background:var(--panel);border:none;
+  border-radius:100px;padding:16px 22px;font-size:12px;font-weight:300;color:var(--ink3);}
+.login-box input:focus{outline:1px solid var(--am);}
+.login-box input::placeholder{color:var(--ink3);font-weight:300;text-transform:none;letter-spacing:0;font-size:12px;}
+.login-box .sub{color:var(--ink2);font-size:12.5px;font-weight:300;line-height:1.8;text-transform:none;letter-spacing:0;margin-bottom:28px;}
+.login-box button.primary{border-radius:100px;text-transform:uppercase;letter-spacing:.2em;font-size:10px;
+  background:linear-gradient(90deg,var(--am2),var(--am));border:none;color:var(--ami);padding:15px;font-weight:600;
+  box-shadow:0 8px 20px rgba(232,163,61,.25);}
+.login-box button.primary:hover{filter:brightness(1.08);}
+.login-box .link-btn{background:none;border:none;color:var(--ink3);font-size:11px;text-transform:uppercase;
+  letter-spacing:.06em;cursor:pointer;margin-top:20px;width:100%;}
+.login-err{color:var(--err);font-size:12px;margin-top:14px;min-height:14px;}
+
+.steps{display:flex;flex-direction:column;gap:2px;margin:8px 0;}
+.step{display:flex;align-items:center;gap:14px;padding:10px 4px;position:relative;}
+.step .dot{width:24px;height:24px;border-radius:50%;background:var(--panel2);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:var(--ink3);z-index:1;}
+.step.done .dot{background:var(--am);border-color:var(--am);color:var(--ami);}
+.step.current .dot{background:var(--ami);border-color:var(--am);color:var(--am);box-shadow:0 0 0 4px rgba(232,163,61,.15);}
+.step .line{position:absolute;left:15px;top:34px;width:2px;height:calc(100% - 6px);background:var(--line);}
+.step.done .line{background:var(--am);}
+.step .label{font-size:13px;color:var(--ink3);}
+.step.done .label,.step.current .label{color:var(--ink);}
+.step.current .label{font-weight:500;}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px;}
+.row:last-child{border-bottom:none;}
+.row .l{color:var(--ink2);}
+.row .v{color:var(--ink);}
+
+/* ===== estrutura Lumiar App — extraída do arquivo real ===== */
+.lm-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+.lm-hamburger{background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;width:22px;}
+.lm-hamburger span{height:1.4px;background:var(--ink);display:block;}
+.lm-hamburger span:last-child{width:14px;}
+.lm-topbar-title{font-family:"Cormorant Garamond",serif;font-size:21px;color:var(--ink);}
+.lm-avatar{width:34px;height:34px;border-radius:50%;background:var(--panel2);display:flex;align-items:center;
+  justify-content:center;color:var(--ink2);font-family:"Montserrat",sans-serif;font-weight:600;font-size:13px;flex-shrink:0;}
+.lm-back-crumb{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);cursor:pointer;}
+
+.lm-hero{position:relative;border-radius:24px;overflow:hidden;height:200px;margin-bottom:20px;
+  background:radial-gradient(120% 140% at 15% 0%,#2b2416,var(--panel) 60%);}
+.lm-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,20,.05),rgba(20,20,20,.92));}
+.lm-hero-text{position:absolute;left:22px;right:22px;bottom:20px;}
+.lm-hero-eyebrow{font-size:8.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--am);margin-bottom:11px;}
+.lm-hero-title{font-family:"Cormorant Garamond",serif;font-size:19px;line-height:1.35;color:var(--ink);}
+
+.lm-stats{display:flex;gap:10px;margin-bottom:22px;}
+.lm-stat{flex:1;background:var(--panel);border-radius:16px;padding:16px 14px;}
+.lm-stat .n{display:block;font-family:"Cormorant Garamond",serif;font-size:24px;color:var(--ink);margin-bottom:9px;}
+.lm-stat.warn .n{color:var(--am);}
+.lm-stat .l{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);}
+
+.lm-section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:13px;}
+.lm-section-head span:first-child{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);}
+.lm-vertudo{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--am);cursor:pointer;}
+.lm-modules{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px;}
+.lm-module{background:var(--panel);border-radius:16px;padding:17px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.lm-module svg{width:17px;height:17px;stroke:var(--am);stroke-width:1.3;fill:none;flex-shrink:0;}
+.lm-module-title{font-family:"Cormorant Garamond",serif;font-size:15px;color:var(--ink);margin-bottom:6px;}
+.lm-module-sub{font-size:8px;font-weight:300;letter-spacing:.08em;color:var(--ink3);}
+
+.lm-view-title{font-family:"Cormorant Garamond",serif;font-size:30px;color:var(--ink);margin-bottom:10px;}
+.lm-view-sub{font-size:11px;font-weight:300;letter-spacing:.06em;color:var(--ink2);margin-bottom:20px;}
+
+.lm-filter-row{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px;}
+.lm-filter{flex-shrink:0;background:var(--panel2);color:var(--ink2);border-radius:100px;padding:10px 16px;
+  font-size:8.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;}
+.lm-filter.on{background:var(--am);color:var(--ami);font-weight:600;}
+
+.lm-cta{display:block;width:100%;text-align:center;background:var(--am);color:var(--ami);border:none;
+  border-radius:100px;padding:17px 0;font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;margin-bottom:20px;}
+.lm-cta:active{transform:scale(.97);}
+
+.lm-lead-row{background:var(--panel);border-radius:18px;padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer;}
+.lm-lead-avatar{width:52px;height:52px;flex:none;border-radius:14px;background:var(--panel2);display:flex;
+  align-items:center;justify-content:center;color:var(--ink2);font-family:"Cormorant Garamond",serif;font-size:17px;}
+.lm-lead-nome{font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--ink);margin-bottom:8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lm-lead-sub{font-size:8.5px;font-weight:300;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);}
+.lm-lead-tag{font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px;}
+.lm-lead-tempo{font-size:8.5px;font-weight:300;color:var(--ink3);}
+
+/* ===== Orçamentos ===== */
+.lm-pipeline-panel{background:var(--panel);border-radius:24px;padding:22px;margin-bottom:22px;}
+.lm-pipeline-eyebrow{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);margin-bottom:15px;}
+.lm-pipeline-valor{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+.lm-pipeline-valor span{font-family:"Cormorant Garamond",serif;font-size:32px;color:var(--ink);}
+.lm-pipeline-bar{display:flex;height:6px;gap:3px;}
+.lm-pipeline-bar div{border-radius:3px;}
+.lm-pipeline-labels{display:flex;justify-content:space-between;margin-top:13px;font-size:8px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);}
+
+.lm-opp-card{background:var(--panel);border-radius:18px;padding:18px;cursor:pointer;}
+.lm-opp-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:13px;}
+.lm-opp-nome{font-family:"Cormorant Garamond",serif;font-size:16px;line-height:1.25;color:var(--ink);}
+.lm-opp-valor{font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--ink);white-space:nowrap;}
+.lm-opp-mid{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.lm-opp-status{font-size:8px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;}
+.lm-opp-data{font-size:9px;font-weight:300;color:var(--ink3);}
+.lm-opp-track{height:4px;background:#2f2f2f;border-radius:2px;}
+.lm-opp-fill{height:4px;border-radius:2px;}
+
+.lm-cta-outline{display:block;width:100%;text-align:center;background:var(--panel2);color:var(--ink2);border:none;
+  border-radius:100px;padding:16px 0;font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  cursor:pointer;margin-bottom:20px;}
+.lm-portal-eyebrow{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;}
+
+/* ===== Loja — linhas com stepper de quantidade + carrinho fixo ===== */
+.lm-loja-row{background:var(--panel);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px;}
+.lm-loja-row .info{flex:1;min-width:0;}
+.lm-loja-nome{font-family:"Cormorant Garamond",serif;font-size:15px;color:var(--ink);margin-bottom:3px;}
+.lm-loja-meta{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+.lm-loja-preco{font-family:"Cormorant Garamond",serif;font-size:15px;color:var(--am);white-space:nowrap;margin-right:4px;}
+
+/* ===== Agenda ===== */
+.lm-agenda-row{background:var(--panel);border-radius:16px;padding:14px;display:flex;gap:14px;align-items:center;}
+.lm-agenda-data{width:50px;flex-shrink:0;text-align:center;}
+.lm-agenda-data .dia{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--ink);line-height:1;}
+.lm-agenda-data .mes{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-top:2px;}
+.lm-agenda-body{flex:1;min-width:0;}
+.lm-agenda-titulo{font-family:"Cormorant Garamond",serif;font-size:15px;color:var(--ink);margin-bottom:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lm-agenda-meta{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+.lm-agenda-status{flex-shrink:0;}
+
+/* ===== Galeria ===== */
+.lm-galeria-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px;}
+.lm-foto-card{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--panel2);cursor:pointer;}
+.lm-foto-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.lm-foto-badge{position:absolute;bottom:4px;right:4px;background:rgba(10,10,10,.65);backdrop-filter:blur(3px);
+  color:var(--am);font-size:8px;padding:2px 6px;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;}
+.lm-foto-fav{position:absolute;top:4px;right:4px;width:20px;height:20px;color:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));}
+.lm-stepper{display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:100px;padding:4px 6px;}
+.lm-stepper button{width:22px;height:22px;border-radius:50%;background:var(--am);color:var(--ami);border:none;
+  font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lm-stepper span{font-size:12px;color:var(--ink);min-width:14px;text-align:center;}
+
+.lm-carrinho-bar{position:fixed;left:0;right:0;bottom:0;background:var(--panel2);border-top:1px solid var(--line);
+  padding:14px 20px;display:flex;justify-content:space-between;align-items:center;z-index:120;}
+.lm-carrinho-qtd{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);}
+.lm-carrinho-total{font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--ink);}
+@media(min-width:960px){ .lm-carrinho-bar{left:220px;} }
+
+/* ===== Catálogo — cartões estilo vitrine, identidade Lumiar ===== */
+.lm-cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.lm-cat-card{background:var(--panel);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s;}
+.lm-cat-card:active{transform:scale(.97);}
+.lm-cat-media{height:84px;position:relative;display:flex;align-items:center;justify-content:center;}
+.lm-cat-media svg{width:26px;height:26px;stroke:rgba(255,255,255,.35);stroke-width:1.2;fill:none;}
+.lm-cat-chip{position:absolute;top:8px;right:8px;background:rgba(10,10,10,.55);backdrop-filter:blur(4px);
+  color:var(--am);font-size:10.5px;font-family:"Cormorant Garamond",serif;padding:4px 11px;border-radius:100px;}
+.lm-cat-stock{position:absolute;top:8px;left:8px;background:rgba(10,10,10,.55);backdrop-filter:blur(4px);
+  color:var(--ink2);font-size:8px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:100px;}
+.lm-cat-stock.baixo{color:var(--warn);}
+.lm-cat-body{padding:12px 14px;}
+.lm-cat-name{font-family:"Cormorant Garamond",serif;font-size:15px;color:var(--ink);margin-bottom:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lm-cat-meta{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+.lm-cat-card .lm-stepper{margin-top:10px;justify-content:center;}
+.lm-cat-card.no-hover{cursor:default;}
+
+/* ===== Kanban — colunas arrastáveis, estilo Trello ===== */
+.kanban-scroll{overflow-x:auto;margin:0 -22px;padding:4px 22px 12px;-webkit-overflow-scrolling:touch;}
+.kanban-board{display:flex;gap:14px;align-items:flex-start;min-width:min-content;}
+.kanban-col{flex:0 0 240px;background:var(--bg);border:1px solid var(--line);border-radius:16px;}
+.kanban-col-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--line);}
+.kanban-col-head b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);font-weight:500;}
+.kanban-col-head span{font-size:11px;color:var(--ink3);background:var(--panel2);padding:2px 7px;border-radius:2px;}
+.kanban-drop{min-height:60px;padding:10px;display:flex;flex-direction:column;gap:8px;}
+.kanban-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:grab;
+  transition:border-color .15s;}
+.kanban-card:hover{border-color:rgba(232,163,61,.35);}
+.kanban-card.sortable-ghost{opacity:.3;}
+.kanban-card .kc-nome{font-size:13.5px;color:var(--ink);margin-bottom:2px;}
+.kanban-card .kc-titulo{font-size:11px;color:var(--ink3);margin-bottom:8px;}
+.kanban-card .kc-valor{font-size:13px;color:var(--am);font-variant-numeric:tabular-nums;margin-bottom:8px;}
+.kanban-card .kc-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.kc-tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;background:var(--panel2);color:var(--ink2);
+  padding:2px 8px;border-radius:100px;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+</head>
+<body>
+
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div id="login-logo-slot" style="width:150px;max-width:60%;margin:0 auto 24px;min-height:40px;display:flex;align-items:center;justify-content:center">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--ink);letter-spacing:.02em">Lumiar</span>
+    </div>
+    <p class="sub" id="login-sub">Leads, sessões, seleção e entrega — a operação do estúdio em um só lugar.</p>
+    <input id="lg-email" type="email" placeholder="seu@email.com" autocomplete="username">
+    <input id="lg-senha" type="password" placeholder="Senha" autocomplete="current-password">
+    <button class="primary" style="width:100%" id="lg-btn" onclick="fazerLogin()">Entrar no estúdio</button>
+    <button class="link-btn" id="lg-toggle" onclick="alternarModoLogin()">Primeiro acesso? Criar conta</button>
+    <div class="login-err" id="lg-err"></div>
+  </div>
+</div>
+
+<button class="fab-btn" onclick="toggleFabMenu()" id="fab-toggle" style="display:none">
+  <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="nav-backdrop" id="nav-backdrop" style="display:none" onclick="if(event.target===this) toggleFabMenu()">
+  <nav class="fab-menu" id="fab-menu">
+    <div class="brand-side">Lumiar · <em>Central</em></div>
+    <div class="fab-menu-rule"></div>
+    <button onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>Visão geral</button>
+    <button onclick="mostrarView('leads')"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads</button>
+    <button onclick="mostrarView('opps')"><svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg>Oportunidades</button>
+    <button onclick="mostrarView('projetos')"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Projetos</button>
+    <button onclick="mostrarView('agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Agenda</button>
+    <button onclick="mostrarView('galeria')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Galeria</button>
+    <button onclick="mostrarView('loja')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>Loja</button>
+    <button onclick="mostrarView('financeiro')"><svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro</button>
+    <button onclick="mostrarView('contatos')"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contatos</button>
+    <button onclick="mostrarView('fornecedores')"><svg viewBox="0 0 24 24"><path d="M3 3h18v6H3zM3 9v12h18V9M8 15h8"/></svg>Fornecedores</button>
+    <button onclick="mostrarView('ajustes')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Ajustes</button>
+    <hr>
+    <button onclick="exportarBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exportar backup</button>
+    <button onclick="sair()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </nav>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+
+  <div class="view" id="view-home">
+  <div class="lm-topbar">
+    <div class="brand-mark" id="brand-mark-topo">L</div>
+    <div class="lm-topbar-title">Central</div>
+    <div class="lm-avatar" id="avatar-topo">V</div>
+  </div>
+
+  <div class="lm-hero">
+    <div class="lm-hero-overlay"></div>
+    <div class="lm-hero-text">
+      <div class="lm-hero-eyebrow" id="hero-semana">Esta semana</div>
+      <div class="lm-hero-title" id="hero-frase">Carregando o resumo da semana…</div>
+    </div>
+  </div>
+
+  <div class="lm-stats" id="cards" style="scroll-margin-top:20px">
+    <div class="lm-stat"><b class="n">–</b><span class="l">Leads</span></div>
+    <div class="lm-stat"><b class="n">–</b><span class="l">Pipeline</span></div>
+    <div class="lm-stat warn"><b class="n">–</b><span class="l">Atrasos</span></div>
+  </div>
+
+  <div class="lm-section-head">
+    <span>Módulos</span>
+    <span class="lm-vertudo" onclick="mostrarView('leads')">Ver tudo</span>
+  </div>
+  <div class="lm-modules">
+    <div class="lm-module" onclick="mostrarView('leads')">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <div><div class="lm-module-title">Leads</div><div class="lm-module-sub" id="mod-leads-sub">—</div></div>
+    </div>
+    <div class="lm-module" onclick="mostrarView('opps')">
+      <svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+      <div><div class="lm-module-title">Orçamentos</div><div class="lm-module-sub" id="mod-opps-sub">—</div></div>
+    </div>
+    <div class="lm-module" onclick="mostrarView('projetos')">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <div><div class="lm-module-title">Projetos</div><div class="lm-module-sub" id="mod-projetos-sub">—</div></div>
+    </div>
+    <div class="lm-module" onclick="mostrarView('loja')">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+      <div><div class="lm-module-title">Loja</div><div class="lm-module-sub" id="mod-loja-sub">—</div></div>
+    </div>
+    <div class="lm-module" onclick="mostrarView('financeiro')">
+      <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <div><div class="lm-module-title">Financeiro</div><div class="lm-module-sub" id="mod-financeiro-sub">—</div></div>
+    </div>
+    <div class="lm-module" onclick="mostrarView('galeria')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <div><div class="lm-module-title">Galeria</div><div class="lm-module-sub">Seleção de fotos</div></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="view" id="view-leads" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+      <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:var(--ink);stroke-width:1.4;fill:none"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/></svg>
+    </div>
+    <div class="lm-view-title">Leads</div>
+    <div class="lm-view-sub" id="leads-contagem">carregando…</div>
+    <div class="lm-filter-row" id="leads-filtros">
+      <div class="lm-filter on" data-f="todos" onclick="filtrarLeads('todos')">Todos</div>
+      <div class="lm-filter" data-f="novo" onclick="filtrarLeads('novo')">Novos</div>
+      <div class="lm-filter" data-f="qualificado" onclick="filtrarLeads('qualificado')">Quentes</div>
+      <div class="lm-filter" data-f="desqualificado" onclick="filtrarLeads('desqualificado')">Frios</div>
+    </div>
+    <div id="lista-leads" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+    <button class="lm-cta" onclick="abrirNovoLead()">Novo lead</button>
+
+    <div class="pager">
+      <button onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <span class="pager-idx">02 / 11</span>
+      <button class="next" onclick="mostrarView('opps')">Orçamentos<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-opps" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:22px">Orçamentos</div>
+
+    <div class="lm-pipeline-panel">
+      <div class="lm-pipeline-eyebrow">Pipeline em aberto</div>
+      <div class="lm-pipeline-valor">
+        <span id="pipeline-total">R$ 0</span>
+      </div>
+      <div class="lm-pipeline-bar" id="pipeline-bar"></div>
+      <div class="lm-pipeline-labels"><span>Proposta</span><span>Negociação</span><span>Fechamento</span></div>
+    </div>
+
+    <div id="lista-oportunidades" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <div style="display:flex;gap:10px;margin-bottom:20px">
+      <button class="lm-cta-outline" style="flex:1;margin-bottom:0" onclick="mostrarView('leads')">Ver leads</button>
+      <button class="lm-cta" style="flex:1;margin-bottom:0" onclick="mostrarView('leads')">Nova proposta</button>
+    </div>
+
+    <div class="pager">
+      <button onclick="mostrarView('leads')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Leads</button>
+      <span class="pager-idx">03 / 11</span>
+      <button class="next" onclick="mostrarView('projetos')">Projetos<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-projetos" style="display:none">
+    <div class="view-head">
+      <button class="back-btn" onclick="mostrarView('home')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Central</button>
+      <div class="view-eyebrow">Operação</div>
+      <h1 class="view-title">Projetos</h1>
+      <div class="view-rule"></div>
+    </div>
+
+    <section>
+    <h2 id="sec-projetos"><svg class="icn" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Projetos</h2>
+    <div class="kanban-scroll"><div class="kanban-board" id="kanban-board"></div></div>
+  </section>
+    <div class="pager">
+      <button onclick="mostrarView('opps')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Oportunidades</button>
+      <span class="pager-idx">04 / 11</span>
+      <button class="next" onclick="mostrarView('agenda')">Agenda<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-loja" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:4px">Loja</div>
+    <div class="lm-view-sub">Serviços, pacotes e produtos — tudo num só lugar. Monte o pedido e finalize.</div>
+
+    <div class="lm-filter-row">
+      <div class="lm-filter on" data-lojatab="vitrine" onclick="mudarAbaLoja('vitrine')">Vitrine</div>
+      <div class="lm-filter" data-lojatab="servicos" onclick="mudarAbaLoja('servicos')">Serviços</div>
+      <div class="lm-filter" data-lojatab="pacotes" onclick="mudarAbaLoja('pacotes')">Pacotes</div>
+    </div>
+
+    <div id="loja-aba-vitrine">
+      <div id="lista-loja" class="lm-cat-grid" style="margin-bottom:100px"></div>
+    </div>
+
+    <div id="loja-aba-servicos" style="display:none">
+      <div class="form-row" style="margin-bottom:16px">
+        <select id="p-categoria">
+          <option value="impressao_avulsa">Impressão avulsa</option>
+          <option value="quadro">Quadro</option>
+          <option value="album">Álbum</option>
+          <option value="caixa_estojo_pendrive">Caixa/estojo p/ pendrive</option>
+          <option value="caixa_estojo_luva_album">Caixa/luva p/ álbum</option>
+          <option value="acessorio">Acessório</option>
+          <option value="outro">Outro</option>
+        </select>
+        <input id="p-nome" placeholder="Nome do produto">
+        <input id="p-tamanho" placeholder="Tamanho (opcional)">
+        <input id="p-preco" type="number" placeholder="Preço">
+        <button class="primary" onclick="criarProduto()">Adicionar produto</button>
+      </div>
+      <div class="lm-section-head"><span>Serviços por nicho</span></div>
+      <div class="table-scroll" style="margin-bottom:20px"><table>
+        <thead><tr><th>Nicho</th><th>Serviço</th><th>Preço base</th><th></th></tr></thead>
+        <tbody id="tbl-servicos"><tr><td colspan="4" class="empty">carregando…</td></tr></tbody>
+      </table></div>
+      <div class="lm-section-head"><span>Produtos cadastrados</span></div>
+      <div class="table-scroll" style="margin-bottom:20px"><table>
+        <thead><tr><th>Categoria</th><th>Produto</th><th>Tamanho</th><th>Preço</th><th>Estoque</th><th></th></tr></thead>
+        <tbody id="tbl-produtos"><tr><td colspan="6" class="empty">carregando…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <div id="loja-aba-pacotes" style="display:none">
+      <div class="lm-cat-grid" id="grid-pacotes" style="margin-bottom:20px"></div>
+      <button class="lm-cta-outline" onclick="abrirNovoPacote()">+ Novo pacote</button>
+    </div>
+
+    <div class="lm-carrinho-bar" id="carrinho-bar" style="display:none">
+      <div>
+        <div class="lm-carrinho-qtd" id="carrinho-qtd">0 itens</div>
+        <div class="lm-carrinho-total" id="carrinho-total">R$ 0,00</div>
+      </div>
+      <button class="primary" onclick="abrirFinalizarPedido()">Finalizar pedido</button>
+    </div>
+
+    <div class="pager">
+      <button onclick="mostrarView('galeria')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Galeria</button>
+      <span class="pager-idx">07 / 11</span>
+      <button class="next" onclick="mostrarView('financeiro')">Financeiro<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-financeiro" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:20px">Financeiro</div>
+
+    <div class="lm-stats" style="margin-bottom:22px">
+      <div class="lm-stat"><b class="n" id="fin-receber">–</b><span class="l">A receber</span></div>
+      <div class="lm-stat"><b class="n" id="fin-recebido">–</b><span class="l">Recebido</span></div>
+      <div class="lm-stat warn"><b class="n" id="fin-atrasado">–</b><span class="l">Atrasado</span></div>
+    </div>
+
+    <div class="lm-section-head"><span>Parcelas em aberto</span></div>
+    <div id="lista-parcelas" style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px"></div>
+
+    <div class="lm-section-head"><span>Pedidos da loja</span></div>
+    <div id="lista-pedidos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <div class="pager">
+      <button onclick="mostrarView('loja')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Loja</button>
+      <span class="pager-idx">08 / 11</span>
+      <button class="next" onclick="mostrarView('contatos')">Contatos<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-contatos" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:4px">Contatos</div>
+    <div class="lm-view-sub" id="contatos-contagem">carregando…</div>
+
+    <div class="lm-filter-row" id="contatos-filtros">
+      <div class="lm-filter on" data-f="todos" onclick="filtrarContatos('todos')">Todos</div>
+      <div class="lm-filter" data-f="lead" onclick="filtrarContatos('lead')">Leads</div>
+      <div class="lm-filter" data-f="cliente" onclick="filtrarContatos('cliente')">Clientes</div>
+      <div class="lm-filter" data-f="fornecedor" onclick="filtrarContatos('fornecedor')">Fornecedores</div>
+    </div>
+
+    <div id="lista-contatos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <div class="pager">
+      <button onclick="mostrarView('financeiro')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Financeiro</button>
+      <span class="pager-idx">09 / 11</span>
+      <button class="next" onclick="mostrarView('fornecedores')">Fornecedores<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-fornecedores" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:20px">Fornecedores</div>
+
+    <button class="lm-cta" onclick="abrirNovoFornecedor()">+ Novo fornecedor</button>
+    <div id="lista-fornecedores" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <div class="pager">
+      <button onclick="mostrarView('contatos')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Contatos</button>
+      <span class="pager-idx">10 / 11</span>
+      <button class="next" onclick="mostrarView('ajustes')">Ajustes<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-galeria" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:20px">Galeria · Seleção</div>
+
+    <select id="gal-projeto" style="width:100%;margin-bottom:14px" onchange="carregarGaleriaDoProjeto()">
+      <option value="">Escolha o projeto…</option>
+    </select>
+
+    <div id="gal-upload-area" style="display:none;margin-bottom:20px">
+      <input type="file" id="gal-arquivo" accept="image/*" multiple style="display:none" onchange="uploadFotos()">
+      <button class="lm-cta" style="margin-bottom:0" onclick="document.getElementById('gal-arquivo').click()">+ Enviar fotos</button>
+    </div>
+
+    <div class="lm-galeria-grid" id="grid-galeria"></div>
+
+    <div class="pager">
+      <button onclick="mostrarView('agenda')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Agenda</button>
+      <span class="pager-idx">06 / 11</span>
+      <button class="next" onclick="mostrarView('loja')">Loja<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-agenda" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:4px">Agenda</div>
+    <div class="lm-view-sub" id="agenda-contagem">carregando…</div>
+
+    <button class="lm-cta" onclick="abrirNovoEvento()">+ Novo compromisso</button>
+
+    <div id="lista-agenda" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <div class="pager">
+      <button onclick="mostrarView('projetos')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Projetos</button>
+      <span class="pager-idx">05 / 11</span>
+      <button class="next" onclick="mostrarView('galeria')">Galeria<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+  <div class="view" id="view-ajustes" style="display:none">
+    <div class="lm-topbar" style="margin-bottom:6px">
+      <span class="lm-back-crumb" onclick="mostrarView('home')">‹ Central</span>
+    </div>
+    <div class="lm-view-title" style="margin-bottom:20px">Ajustes</div>
+
+    <div class="lm-section-head"><span>Identidade visual</span></div>
+    <div style="background:var(--panel);border-radius:16px;padding:18px;margin-bottom:22px">
+      <p style="color:var(--ink2);font-size:12px;margin-bottom:14px">Sua logo aparece no cabeçalho da Central e na tela de login. Nada vem pré-definido — envie a sua.</p>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div id="ajustes-logo-preview" style="width:52px;height:52px;border-radius:14px;background:var(--panel2);
+          display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--ink3);stroke-width:1.3;fill:none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <input type="file" id="ajustes-logo-arquivo" accept="image/*" style="display:none" onchange="salvarLogoPersonalizada()">
+        <button class="lm-cta-outline" style="margin-bottom:0;flex:1" onclick="document.getElementById('ajustes-logo-arquivo').click()">Enviar minha logo</button>
+      </div>
+      <button class="lm-cta-outline" style="margin-bottom:0" onclick="removerLogoPersonalizada()">Remover e voltar ao padrão</button>
+    </div>
+
+    <div class="lm-section-head"><span>Dados do estúdio (privado)</span></div>
+    <div style="background:var(--panel);border-radius:16px;padding:18px;margin-bottom:22px">
+      <p style="color:var(--ink2);font-size:12px;margin-bottom:14px">Essas informações ficam só no seu aparelho — nunca são enviadas a lugar nenhum. Preencha só o que quiser guardar aqui.</p>
+      <input id="ajustes-cnpj" placeholder="CNPJ / CPF (opcional)" style="width:100%;margin-bottom:10px">
+      <input id="ajustes-chave-pix" placeholder="Chave PIX (opcional)" style="width:100%;margin-bottom:10px">
+      <input id="ajustes-endereco" placeholder="Endereço do estúdio (opcional)" style="width:100%;margin-bottom:14px">
+      <button class="primary" style="width:100%" onclick="salvarDadosSensiveis()">Salvar</button>
+    </div>
+
+    <div class="lm-section-head"><span>Conta</span></div>
+    <div style="background:var(--panel);border-radius:16px;padding:18px">
+      <div class="row"><span class="l">E-mail de acesso</span><span class="v" id="ajustes-email">—</span></div>
+      <button class="lm-cta-outline" style="margin-top:14px;margin-bottom:0" onclick="sair()">Sair da conta</button>
+    </div>
+
+    <div class="pager">
+      <button onclick="mostrarView('fornecedores')"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Fornecedores</button>
+      <span class="pager-idx">11 / 11</span>
+      <button class="next" onclick="mostrarView('home')">Central<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <span>v4.1.0 · 30 ago 2026</span>
+  <button onclick="verVersoes()">histórico de versões</button>
+</footer>
+
+<div class="sh" id="sheet" onclick="if(event.target===this)fecharSheet()">
+  <div class="pn" id="sheet-content"></div>
+</div>
+
+<div id="portal-overlay" style="display:none;position:fixed;inset:0;background:var(--void);z-index:200;overflow-y:auto;">
+  <div style="max-width:480px;margin:0 auto;padding:28px 22px 60px">
+    <span class="lm-back-crumb" onclick="fecharPortal()" style="display:inline-block;margin-bottom:22px">‹ Central</span>
+    <div id="portal-content"><div class="empty">carregando…</div></div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://tfctfqmolfzatxlnhpdw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmY3RmcW1vbGZ6YXR4bG5ocGR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNjE5NDQsImV4cCI6MjEwMzYzNzk0NH0.M3DYwIb-RYRR3Td_fOrHw8Uc94VWK3KGxQcigZhtgHg';
+
+async function sb(path, opts={}){
+  const token = sessaoAtual?.access_token || SB_KEY;
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    ...opts,
+    headers:{
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers||{})
+    }
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`${res.status}: ${t}`);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+// ===================== AUTENTICAÇÃO =====================
+let sessaoAtual = null;
+let modoCadastro = false;
+
+function salvarSessao(s){
+  sessaoAtual = {access_token: s.access_token, refresh_token: s.refresh_token, email: s.user?.email};
+  localStorage.setItem('lumiar_session', JSON.stringify({
+    access_token: s.access_token, refresh_token: s.refresh_token,
+    expires_at: Date.now() + (s.expires_in*1000), email: s.user?.email
+  }));
+}
+
+async function authFetch(path, body){
+  const res = await fetch(`${SB_URL}/auth/v1/${path}`, {
+    method:'POST',
+    headers:{ 'apikey': SB_KEY, 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error_description || data.msg || data.error || 'Erro de autenticação');
+  return data;
+}
+
+async function fazerLogin(){
+  const email = document.getElementById('lg-email').value.trim();
+  const senha = document.getElementById('lg-senha').value;
+  const btn = document.getElementById('lg-btn');
+  const err = document.getElementById('lg-err');
+  err.textContent = '';
+
+  if(!email || !senha){ err.textContent = 'Preencha e-mail e senha'; return; }
+  if(senha.length < 6){ err.textContent = 'A senha precisa ter pelo menos 6 caracteres'; return; }
+
+  btn.disabled = true; btn.textContent = modoCadastro ? 'Criando conta…' : 'Entrando…';
+  try{
+    let sessao;
+    if(modoCadastro){
+      const r = await authFetch('signup', {email, password: senha});
+      if(!r.access_token){
+        err.textContent = 'Conta criada. Verifique seu e-mail se a confirmação estiver ativa, ou tente entrar.';
+        alternarModoLogin();
+        return;
+      }
+      sessao = r;
+    }else{
+      sessao = await authFetch('token?grant_type=password', {email, password: senha});
+    }
+    salvarSessao(sessao);
+    entrarNoApp();
+  }catch(e){
+    err.textContent = e.message;
+  }finally{
+    btn.disabled = false; btn.textContent = modoCadastro ? 'Criar conta' : 'Entrar';
+  }
+}
+
+function alternarModoLogin(){
+  modoCadastro = !modoCadastro;
+  document.getElementById('lg-btn').textContent = modoCadastro ? 'Criar conta' : 'Entrar no estúdio';
+  document.getElementById('lg-toggle').textContent = modoCadastro ? 'Já tenho conta, entrar' : 'Primeiro acesso? Criar conta';
+  document.getElementById('login-sub').textContent = modoCadastro ? 'Crie o acesso único do proprietário.' : 'Leads, sessões, seleção e entrega — a operação do estúdio em um só lugar.';
+  document.getElementById('lg-err').textContent = '';
+}
+
+async function tentarRestaurarSessao(){
+  const raw = localStorage.getItem('lumiar_session');
+  if(!raw) return false;
+  const s = JSON.parse(raw);
+  if(Date.now() < s.expires_at - 60000){
+    sessaoAtual = s;
+    return true;
+  }
+  try{
+    const nova = await authFetch('token?grant_type=refresh_token', {refresh_token: s.refresh_token});
+    salvarSessao(nova);
+    return true;
+  }catch(e){
+    localStorage.removeItem('lumiar_session');
+    return false;
+  }
+}
+
+function sair(){
+  localStorage.removeItem('lumiar_session');
+  sessaoAtual = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('fab-toggle').style.display = 'none';
+  document.getElementById('nav-backdrop').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function entrarNoApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('fab-toggle').style.display = '';
+  document.getElementById('nav-backdrop').style.display = '';
+  iniciarApp();
+}
+
+function toast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? 'var(--err)' : 'var(--line)';
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 3200);
+}
+
+function fmtData(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+
+async function carregarNichos(){
+  window._nichosCache = await sb('nichos?select=id,nome&order=ordem.asc');
+}
+
+async function carregarCards(){
+  const hoje = new Date().toISOString();
+  const em7dias = new Date(Date.now()+7*24*3600*1000).toISOString();
+  const hojeSoData = new Date().toISOString().slice(0,10);
+
+  const [leadsAbertos, oportAbertas, projetosAtivos, sessoes7d, parcelasAtrasadas1, parcelasAtrasadas2] = await Promise.all([
+    sb('leads?select=id&status=not.eq.convertido'),
+    sb('opportunities?select=id,valor_estimado&status=eq.aberta'),
+    sb('projects?select=id&status=not.in.(concluido,cancelado)'),
+    sb(`agenda_events?select=id&inicio=gte.${hoje}&inicio=lte.${em7dias}`),
+    sb('contract_installments?select=id&status=eq.atrasado'),
+    sb(`contract_installments?select=id&status=eq.pendente&vencimento=lt.${hojeSoData}`)
+  ]);
+
+  const pipeline = oportAbertas.reduce((s,o)=>s+Number(o.valor_estimado||0),0);
+  const atrasos = parcelasAtrasadas1.length + parcelasAtrasadas2.length;
+
+  const stats = document.querySelectorAll('.lm-stat .n');
+  if(stats[0]) stats[0].textContent = leadsAbertos.length;
+  if(stats[1]) stats[1].textContent = pipeline >= 1000 ? (pipeline/1000).toFixed(0)+'k' : Math.round(pipeline);
+  if(stats[2]) stats[2].textContent = String(atrasos).padStart(2,'0');
+
+  document.getElementById('mod-leads-sub').textContent = `${leadsAbertos.length} abertos`;
+  document.getElementById('mod-opps-sub').textContent = `${oportAbertas.length} em aberto`;
+  document.getElementById('mod-projetos-sub').textContent = `${projetosAtivos.length} em produção`;
+
+  const heroFrase = document.getElementById('hero-frase');
+  if(heroFrase) heroFrase.textContent = sessoes7d.length
+    ? `${sessoes7d.length} sessão(ões) marcada(s) nos próximos 7 dias.`
+    : 'Nenhuma sessão marcada para os próximos 7 dias.';
+}
+
+function fmtTempoRelativo(iso){
+  const dias = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if(dias <= 0) return 'hoje';
+  if(dias === 1) return 'ontem';
+  return dias + ' dias';
+}
+
+const STATUS_TAG = {
+  novo: {label:'Novo', color:'var(--ink2)'},
+  em_contato: {label:'Retomar', color:'var(--retomar)'},
+  qualificado: {label:'Quente', color:'var(--am)'},
+  desqualificado: {label:'Frio', color:'var(--ink3)'},
+  convertido: {label:'Convertido', color:'var(--ok)'}
+};
+
+let _leadsCache = [];
+let _filtroLeadAtivo = 'todos';
+
+async function carregarLeads(){
+  _leadsCache = await sb('leads?select=id,person_id,nicho_id,status,created_at,persons(name,phone),nichos(nome)&status=not.eq.convertido&order=created_at.desc');
+  document.getElementById('leads-contagem').textContent = `${_leadsCache.length} contatos · ${_leadsCache.filter(l=>l.status==='novo').length} novos`;
+  renderizarLeads();
+}
+
+function filtrarLeads(f){
+  _filtroLeadAtivo = f;
+  document.querySelectorAll('#leads-filtros .lm-filter').forEach(el => el.classList.toggle('on', el.dataset.f === f));
+  renderizarLeads();
+}
+
+function renderizarLeads(){
+  const lista = document.getElementById('lista-leads');
+  const filtrados = _filtroLeadAtivo === 'todos' ? _leadsCache : _leadsCache.filter(l => l.status === _filtroLeadAtivo);
+  if(!filtrados.length){
+    lista.innerHTML = '<div class="empty">Nenhum lead nesse filtro.</div>';
+    return;
+  }
+  lista.innerHTML = filtrados.map(l => {
+    const nome = l.persons?.name || '—';
+    const iniciais = nome.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+    const tag = STATUS_TAG[l.status] || STATUS_TAG.novo;
+    return `
+      <div class="lm-lead-row" onclick="abrirConverter('${l.id}','${l.person_id}','${l.nicho_id||''}','${nome.replace(/'/g,"\\'")}','${(l.persons?.phone||'').replace(/\D/g,'')}')">
+        <div class="lm-lead-avatar">${iniciais}</div>
+        <div style="flex:1;min-width:0">
+          <div class="lm-lead-nome">${nome}</div>
+          <div class="lm-lead-sub">${l.nichos?.nome || 'Sem nicho'} · ${l.persons?.phone ? 'WhatsApp' : 'Sem contato'}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="lm-lead-tag" style="color:${tag.color}">${tag.label}</div>
+          <div class="lm-lead-tempo">${fmtTempoRelativo(l.created_at)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirNovoLead(){
+  const nichos = window._nichosCache || [];
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Novo lead</h3>
+    <input id="f-nome" placeholder="Nome" style="width:100%;margin:14px 0 10px">
+    <input id="f-tel" placeholder="Telefone / WhatsApp" style="width:100%;margin-bottom:10px">
+    <select id="f-nicho" style="width:100%;margin-bottom:16px">
+      <option value="">Nicho…</option>
+      ${nichos.map(n=>`<option value="${n.id}">${n.nome}</option>`).join('')}
+    </select>
+    <button class="primary" style="width:100%" onclick="criarLead()">Adicionar</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+const BUCKET = (p) => p >= 80 ? {label:'Fechamento', color:'var(--am)'} : p >= 40 ? {label:'Negociação', color:'var(--am2)'} : {label:'Proposta', color:'var(--amdark)'};
+
+function fmtMesAbrev(iso){
+  const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const d = new Date(iso+'T12:00:00');
+  return `${String(d.getDate()).padStart(2,'0')} ${meses[d.getMonth()]}`;
+}
+
+async function carregarOportunidades(){
+  const opps = await sb('opportunities?select=id,person_id,nicho_id,valor_estimado,probabilidade,previsao_fechamento,persons(name),nichos(nome)&status=eq.aberta&order=created_at.desc');
+
+  const total = opps.reduce((s,o)=>s+Number(o.valor_estimado||0),0);
+  document.getElementById('pipeline-total').textContent = 'R$ ' + Math.round(total).toLocaleString('pt-BR');
+
+  const somaPorBucket = {Proposta:0, 'Negociação':0, Fechamento:0};
+  opps.forEach(o => { somaPorBucket[BUCKET(o.probabilidade||20).label] += Number(o.valor_estimado||0); });
+  const barra = document.getElementById('pipeline-bar');
+  if(total > 0){
+    barra.innerHTML = `
+      <div style="width:${somaPorBucket.Proposta/total*100}%;background:var(--amdark)"></div>
+      <div style="width:${somaPorBucket['Negociação']/total*100}%;background:var(--am2)"></div>
+      <div style="width:${somaPorBucket.Fechamento/total*100}%;background:var(--am)"></div>
+      <div style="flex:1;background:#2f2f2f"></div>
+    `;
+  }else{
+    barra.innerHTML = `<div style="flex:1;background:#2f2f2f"></div>`;
+  }
+
+  const lista = document.getElementById('lista-oportunidades');
+  if(!opps.length){
+    lista.innerHTML = '<div class="empty">Nenhuma oportunidade em aberto. Converta um lead na tela anterior.</div>';
+    return;
+  }
+  lista.innerHTML = opps.map(o => {
+    const prob = o.probabilidade || 20;
+    const b = BUCKET(prob);
+    return `
+      <div class="lm-opp-card" onclick="abrirDetalheOportunidade('${o.id}','${o.person_id}','${o.nicho_id||''}')">
+        <div class="lm-opp-top">
+          <span class="lm-opp-nome">${o.nichos?.nome || 'Projeto'} · ${o.persons?.name || '—'}</span>
+          <span class="lm-opp-valor" style="${prob>=80?'color:var(--am)':''}">R$ ${Number(o.valor_estimado||0).toLocaleString('pt-BR')}</span>
+        </div>
+        <div class="lm-opp-mid">
+          <span class="lm-opp-status" style="color:${b.color}">${b.label} · ${prob}%</span>
+          <span class="lm-opp-data">${o.previsao_fechamento ? 'Fecha ' + fmtMesAbrev(o.previsao_fechamento) : 'Sem previsão'}</span>
+        </div>
+        <div class="lm-opp-track"><div class="lm-opp-fill" style="width:${prob}%;background:${b.color}"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirDetalheOportunidade(oppId, personId, nichoId){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Fechar oportunidade</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:18px">Marcar como ganha vai criar o cliente e o projeto automaticamente.</p>
+    <button class="lm-cta" onclick="fecharSheet();fecharOportunidade('${oppId}','${personId}','${nichoId}')">Fechar como ganha</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function carregarCatalogoServicos(){
+  const servicos = await sb('servicos?select=id,nome,preco_base,nichos(nome)&order=nome.asc');
+  const modSub = document.getElementById('mod-catalogo-sub');
+  if(modSub) modSub.textContent = `${servicos.length} serviços`;
+  const tbody = document.getElementById('tbl-servicos');
+  if(!servicos.length){ tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum serviço cadastrado.</td></tr>'; return; }
+  tbody.innerHTML = servicos.map(s => `
+    <tr>
+      <td>${s.nichos?.nome || '—'}</td>
+      <td class="nome">${s.nome}</td>
+      <td><input type="number" value="${s.preco_base}" id="sv-${s.id}" style="width:100px;padding:6px 8px"></td>
+      <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="salvarServico('${s.id}')">Salvar</button></td>
+    </tr>
+  `).join('');
+}
+
+async function salvarServico(id){
+  const preco = Number(document.getElementById(`sv-${id}`).value);
+  try{
+    await sb(`servicos?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({preco_base: preco}), prefer:'return=minimal'});
+    toast('Preço atualizado');
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+const CATEGORIA_LABEL = {
+  impressao_avulsa:'Impressão avulsa', quadro:'Quadro', album:'Álbum',
+  caixa_estojo_pendrive:'Caixa/estojo pendrive', caixa_estojo_luva_album:'Caixa/luva álbum',
+  acessorio:'Acessório', outro:'Outro'
+};
+
+async function carregarCatalogoProdutos(){
+  const produtos = await sb('produtos?select=id,categoria,nome,produto_variacoes(id,tamanho,preco,estoque)&order=nome.asc');
+  const tbody = document.getElementById('tbl-produtos');
+  if(!produtos.length){ tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum produto ainda.</td></tr>'; return; }
+  const linhas = [];
+  produtos.forEach(p => {
+    if(!p.produto_variacoes.length){
+      linhas.push(`
+        <tr>
+          <td>${CATEGORIA_LABEL[p.categoria]||p.categoria}</td>
+          <td class="nome">${p.nome}</td>
+          <td colspan="3" style="color:var(--ink3)">sem variação cadastrada</td>
+          <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="abrirNovaVariacao('${p.id}','${p.nome.replace(/'/g,"\\'")}')">Adicionar variação</button></td>
+        </tr>
+      `);
+      return;
+    }
+    p.produto_variacoes.forEach((v, i) => {
+      linhas.push(`
+        <tr>
+          ${i===0 ? `<td rowspan="${p.produto_variacoes.length}">${CATEGORIA_LABEL[p.categoria]||p.categoria}</td><td class="nome" rowspan="${p.produto_variacoes.length}">${p.nome}</td>` : ''}
+          <td>${v.tamanho||'—'}</td>
+          <td><input type="number" value="${v.preco}" id="vp-${v.id}" style="width:90px;padding:6px 8px"></td>
+          <td><input type="number" value="${v.estoque}" id="ve-${v.id}" style="width:70px;padding:6px 8px"></td>
+          <td><button class="primary" style="padding:6px 12px;font-size:11px" onclick="salvarVariacao('${v.id}')">Salvar</button></td>
+        </tr>
+      `);
+    });
+  });
+  tbody.innerHTML = linhas.join('');
+}
+
+let novaVariacaoCtx = null;
+
+function abrirNovaVariacao(produtoId, nomeProduto){
+  novaVariacaoCtx = {produtoId};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Nova variação</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:16px">Produto: <b style="color:var(--ink)">${nomeProduto}</b></p>
+    <input id="sh-var-tamanho" placeholder="Tamanho (opcional)" style="width:100%;margin-bottom:10px">
+    <input id="sh-var-preco" type="number" placeholder="Preço" style="width:100%;margin-bottom:10px">
+    <input id="sh-var-estoque" type="number" placeholder="Estoque" value="0" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarNovaVariacao()">Salvar variação</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarNovaVariacao(){
+  const tamanho = document.getElementById('sh-var-tamanho').value.trim();
+  const preco = Number(document.getElementById('sh-var-preco').value);
+  const estoque = Number(document.getElementById('sh-var-estoque').value) || 0;
+  const {produtoId} = novaVariacaoCtx;
+
+  if(!preco){ toast('Informe o preço', true); return; }
+
+  try{
+    await sb('produto_variacoes', {method:'POST', body: JSON.stringify({
+      produto_id: produtoId, tamanho: tamanho || null, preco, estoque
+    }), prefer:'return=minimal'});
+    toast('Variação criada');
+    fecharSheet();
+    await carregarCatalogoProdutos();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function salvarVariacao(id){
+  const preco = Number(document.getElementById(`vp-${id}`).value);
+  const estoque = Number(document.getElementById(`ve-${id}`).value);
+  try{
+    await sb(`produto_variacoes?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({preco, estoque}), prefer:'return=minimal'});
+    toast('Produto atualizado');
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function criarProduto(){
+  const categoria = document.getElementById('p-categoria').value;
+  const nome = document.getElementById('p-nome').value.trim();
+  const tamanho = document.getElementById('p-tamanho').value.trim();
+  const preco = Number(document.getElementById('p-preco').value);
+
+  if(!nome || !preco){ toast('Preencha nome e preço', true); return; }
+
+  try{
+    const produto = await sb('produtos', {method:'POST', body: JSON.stringify({categoria, nome})});
+    await sb('produto_variacoes', {method:'POST', body: JSON.stringify({
+      produto_id: produto[0].id, tamanho: tamanho || null, preco, estoque: 0
+    }), prefer:'return=minimal'});
+    toast('Produto adicionado');
+    fecharSheet();
+    await carregarCatalogoProdutos();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+// ===================== LOJA =====================
+const CAT_GRADIENTES = ['#2b241a,#141210', '#1e2620,#101410', '#241a20,#120e12', '#1a2026,#0e1114', '#26201a,#14100e', '#201a26,#100e14'];
+function gradientePara(texto){
+  let h = 0; for(const c of texto) h = (h*31 + c.charCodeAt(0)) % CAT_GRADIENTES.length;
+  return CAT_GRADIENTES[h];
+}
+const ICONE_PRODUTO = '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>';
+let carrinhoLoja = [];
+let _variacoesCacheLoja = [];
+
+// ===================== PACOTES =====================
+// ===================== CONTATOS (unificado) =====================
+let _contatosCache = [];
+let _filtroContatoAtivo = 'todos';
+
+async function carregarContatos(){
+  const [leadsData, clientesData, fornecedoresData] = await Promise.all([
+    sb('leads?select=person_id,status,persons(name,phone,email)&status=not.eq.convertido'),
+    sb('clients?select=person_id,persons(name,phone,email)'),
+    sb('suppliers?select=id,nome,contato,telefone,email,tipo')
+  ]);
+
+  _contatosCache = [
+    ...leadsData.map(l => ({tipo:'lead', nome:l.persons?.name, telefone:l.persons?.phone, email:l.persons?.email})),
+    ...clientesData.map(c => ({tipo:'cliente', nome:c.persons?.name, telefone:c.persons?.phone, email:c.persons?.email})),
+    ...fornecedoresData.map(f => ({tipo:'fornecedor', nome:f.nome, telefone:f.telefone, email:f.email}))
+  ];
+  document.getElementById('contatos-contagem').textContent = `${_contatosCache.length} contatos no total`;
+  renderizarContatos();
+}
+
+function filtrarContatos(f){
+  _filtroContatoAtivo = f;
+  document.querySelectorAll('#contatos-filtros .lm-filter').forEach(el => el.classList.toggle('on', el.dataset.f === f));
+  renderizarContatos();
+}
+
+const TIPO_CONTATO_LABEL = {lead:'Lead', cliente:'Cliente', fornecedor:'Fornecedor'};
+const TIPO_CONTATO_COR = {lead:'var(--ink2)', cliente:'var(--am)', fornecedor:'var(--retomar)'};
+
+function renderizarContatos(){
+  const lista = document.getElementById('lista-contatos');
+  const filtrados = _filtroContatoAtivo === 'todos' ? _contatosCache : _contatosCache.filter(c => c.tipo === _filtroContatoAtivo);
+  if(!filtrados.length){ lista.innerHTML = '<div class="empty">Nenhum contato nesse filtro.</div>'; return; }
+  lista.innerHTML = filtrados.map(c => {
+    const iniciais = (c.nome||'—').split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
+    const telDigitos = (c.telefone||'').replace(/\D/g,'');
+    return `
+      <div class="lm-lead-row" ${telDigitos ? `onclick="window.open('https://wa.me/55${telDigitos}','_blank')"` : ''}>
+        <div class="lm-lead-avatar">${iniciais}</div>
+        <div style="flex:1;min-width:0">
+          <div class="lm-lead-nome">${c.nome || '—'}</div>
+          <div class="lm-lead-sub">${c.telefone || c.email || 'sem contato'}</div>
+        </div>
+        <div class="lm-lead-tag" style="color:${TIPO_CONTATO_COR[c.tipo]}">${TIPO_CONTATO_LABEL[c.tipo]}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===================== FORNECEDORES =====================
+// ===================== GALERIA · SELEÇÃO =====================
+let _batchAtualGaleria = null;
+
+async function carregarGaleriaProjetos(){
+  const projetos = await sb('projects?select=id,titulo,clients(persons(name))&status=not.in.(concluido,cancelado)&order=created_at.desc');
+  const sel = document.getElementById('gal-projeto');
+  sel.innerHTML = '<option value="">Escolha o projeto…</option>' + projetos.map(p =>
+    `<option value="${p.id}">${p.clients?.persons?.name || '—'} · ${p.titulo}</option>`
+  ).join('');
+}
+
+async function carregarGaleriaDoProjeto(){
+  const projectId = document.getElementById('gal-projeto').value;
+  const uploadArea = document.getElementById('gal-upload-area');
+  const grid = document.getElementById('grid-galeria');
+  if(!projectId){ uploadArea.style.display = 'none'; grid.innerHTML = ''; return; }
+  uploadArea.style.display = 'block';
+
+  let batches = await sb(`curation_batches?project_id=eq.${projectId}&select=id`);
+  if(!batches.length){
+    batches = await sb('curation_batches', {method:'POST', body: JSON.stringify({project_id: projectId, status:'em_curadoria'})});
+  }
+  _batchAtualGaleria = {id: batches[0].id, projectId};
+
+  await renderizarGaleria();
+}
+
+async function renderizarGaleria(){
+  const fotos = await sb(`photos?curation_batch_id=eq.${_batchAtualGaleria.id}&select=id,arquivo_original_url,status&order=ordem.asc`);
+  const grid = document.getElementById('grid-galeria');
+  if(!fotos.length){ grid.innerHTML = '<div class="empty">Nenhuma foto enviada ainda.</div>'; return; }
+  grid.innerHTML = fotos.map(f => `
+    <div class="lm-foto-card" onclick="abrirAcaoFoto('${f.id}','${f.status}')">
+      <img src="${f.arquivo_original_url}" loading="lazy">
+      <span class="lm-foto-badge">${f.status}</span>
+    </div>
+  `).join('');
+}
+
+async function uploadArquivoStorage(path, file){
+  const token = sessaoAtual?.access_token || SB_KEY;
+  const res = await fetch(`${SB_URL}/storage/v1/object/fotos/${path}`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': file.type },
+    body: file
+  });
+  if(!res.ok) throw new Error(await res.text());
+  return `${SB_URL}/storage/v1/object/public/fotos/${path}`;
+}
+
+async function uploadFotos(){
+  const input = document.getElementById('gal-arquivo');
+  const arquivos = Array.from(input.files);
+  if(!arquivos.length) return;
+
+  toast(`Enviando ${arquivos.length} foto(s)…`);
+  try{
+    for(const file of arquivos){
+      const path = `${_batchAtualGaleria.projectId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g,'_')}`;
+      const url = await uploadArquivoStorage(path, file);
+      await sb('photos', {method:'POST', body: JSON.stringify({
+        curation_batch_id: _batchAtualGaleria.id, project_id: _batchAtualGaleria.projectId,
+        arquivo_original_url: url, status: 'raw'
+      }), prefer:'return=minimal'});
+    }
+    toast('Fotos enviadas');
+    input.value = '';
+    await renderizarGaleria();
+  }catch(e){
+    toast('Erro no envio: ' + e.message, true);
+  }
+}
+
+function abrirAcaoFoto(fotoId, statusAtual){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Foto</h3>
+    <p style="color:var(--ink3);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Status atual · ${statusAtual}</p>
+    <button class="primary" style="width:100%;margin-bottom:10px" onclick="aprovarFoto('${fotoId}')">Aprovar foto</button>
+    <button class="lm-cta-outline" style="margin-bottom:0" onclick="excluirFoto('${fotoId}')">Excluir foto</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function aprovarFoto(fotoId){
+  try{
+    await sb('approvals', {method:'POST', body: JSON.stringify({
+      entity_type:'photo', entity_id: fotoId, status:'aprovado', aprovado_em: new Date().toISOString()
+    }), prefer:'return=minimal'});
+    await sb(`photos?id=eq.${fotoId}`, {method:'PATCH', body: JSON.stringify({status:'aprovada'}), prefer:'return=minimal'});
+    toast('Foto aprovada');
+    fecharSheet();
+    await renderizarGaleria();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function excluirFoto(fotoId){
+  try{
+    await sb(`photos?id=eq.${fotoId}`, {method:'DELETE', prefer:'return=minimal'});
+    toast('Foto excluída');
+    fecharSheet();
+    await renderizarGaleria();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function carregarFornecedores(){
+  const fornecedores = await sb('suppliers?select=id,nome,tipo,contato,telefone,email&order=nome.asc');
+  const lista = document.getElementById('lista-fornecedores');
+  if(!fornecedores.length){ lista.innerHTML = '<div class="empty">Nenhum fornecedor cadastrado ainda.</div>'; return; }
+  const TIPO_FORN = {laboratorio:'Laboratório', grafica:'Gráfica', album:'Álbum', outro:'Outro'};
+  lista.innerHTML = fornecedores.map(f => {
+    const telDigitos = (f.telefone||'').replace(/\D/g,'');
+    return `
+      <div class="lm-lead-row" ${telDigitos ? `onclick="window.open('https://wa.me/55${telDigitos}','_blank')"` : ''}>
+        <div class="lm-lead-avatar">${(f.nome||'—').slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div class="lm-lead-nome">${f.nome}</div>
+          <div class="lm-lead-sub">${f.contato || f.telefone || f.email || 'sem contato'}</div>
+        </div>
+        <div class="lm-lead-tag" style="color:var(--ink2)">${TIPO_FORN[f.tipo]||f.tipo}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirNovoFornecedor(){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Novo fornecedor</h3>
+    <select id="fn-tipo" style="width:100%;margin-bottom:10px">
+      <option value="laboratorio">Laboratório</option>
+      <option value="grafica">Gráfica</option>
+      <option value="album">Álbum</option>
+      <option value="outro">Outro</option>
+    </select>
+    <input id="fn-nome" placeholder="Nome" style="width:100%;margin-bottom:10px">
+    <input id="fn-telefone" placeholder="Telefone" style="width:100%;margin-bottom:10px">
+    <input id="fn-email" type="email" placeholder="E-mail (opcional)" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="criarFornecedor()">Salvar</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function criarFornecedor(){
+  const tipo = document.getElementById('fn-tipo').value;
+  const nome = document.getElementById('fn-nome').value.trim();
+  const telefone = document.getElementById('fn-telefone').value.trim();
+  const email = document.getElementById('fn-email').value.trim();
+  if(!nome){ toast('Digite o nome', true); return; }
+  try{
+    await sb('suppliers', {method:'POST', body: JSON.stringify({tipo, nome, telefone: telefone||null, email: email||null}), prefer:'return=minimal'});
+    toast('Fornecedor adicionado');
+    fecharSheet();
+    await carregarFornecedores();
+    await carregarGaleriaProjetos();
+    carregarAjustes();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+async function carregarPacotes(){
+  const pacotes = await sb('pacotes?select=id,nome,preco,fotos_incluidas,nichos(nome),pacote_itens(descricao,quantidade)&order=preco.asc');
+  const modSub = document.getElementById('mod-pacotes-sub');
+  if(modSub) modSub.textContent = `${pacotes.length} pacotes`;
+  const grid = document.getElementById('grid-pacotes');
+  if(!pacotes.length){ grid.innerHTML = '<div class="empty">Nenhum pacote cadastrado.</div>'; return; }
+  grid.innerHTML = pacotes.map(p => `
+    <div class="lm-cat-card" onclick='abrirDetalhePacote(${JSON.stringify(p).replace(/'/g,"&apos;")})'>
+      <div class="lm-cat-media" style="background:linear-gradient(160deg,${gradientePara(p.nome)})">
+        ${ICONE_PRODUTO}
+        <span class="lm-cat-chip">R$ ${Number(p.preco).toLocaleString('pt-BR')}</span>
+      </div>
+      <div class="lm-cat-body">
+        <div class="lm-cat-name">${p.nome}</div>
+        <div class="lm-cat-meta">${p.fotos_incluidas||0} fotos · ${p.nichos?.nome||'Geral'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abrirDetalhePacote(p){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>${p.nome}</h3>
+    <p style="color:var(--am);font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:16px">R$ ${Number(p.preco).toLocaleString('pt-BR')}</p>
+    ${(p.pacote_itens||[]).map(i=>`<div class="row"><span class="l">${i.descricao}</span><span class="v">${i.quantidade}x</span></div>`).join('') || '<p style="color:var(--ink3);font-size:12px">Sem itens cadastrados.</p>'}
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+function abrirNovoPacote(){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Novo pacote</h3>
+    <input id="pk-nome" placeholder="Nome do pacote" style="width:100%;margin-bottom:10px">
+    <input id="pk-preco" type="number" placeholder="Preço" style="width:100%;margin-bottom:10px">
+    <input id="pk-fotos" type="number" placeholder="Fotos incluídas" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="criarPacote()">Criar pacote</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function criarPacote(){
+  const nome = document.getElementById('pk-nome').value.trim();
+  const preco = Number(document.getElementById('pk-preco').value);
+  const fotos = Number(document.getElementById('pk-fotos').value) || null;
+  if(!nome || !preco){ toast('Preencha nome e preço', true); return; }
+  try{
+    await sb('pacotes', {method:'POST', body: JSON.stringify({nome, preco, fotos_incluidas: fotos}), prefer:'return=minimal'});
+    toast('Pacote criado');
+    fecharSheet();
+    await carregarPacotes();
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+function mudarAbaLoja(aba){
+  document.querySelectorAll('#view-loja .lm-filter').forEach(el => el.classList.toggle('on', el.dataset.lojatab === aba));
+  document.getElementById('loja-aba-vitrine').style.display = aba === 'vitrine' ? 'block' : 'none';
+  document.getElementById('loja-aba-servicos').style.display = aba === 'servicos' ? 'block' : 'none';
+  document.getElementById('loja-aba-pacotes').style.display = aba === 'pacotes' ? 'block' : 'none';
+  renderizarCarrinhoBar();
+}
+
+async function carregarLoja(){
+  _variacoesCacheLoja = await sb('produto_variacoes?select=id,tamanho,preco,estoque,produtos(nome,categoria)&estoque=gt.0&order=id.asc');
+  const modSub = document.getElementById('mod-loja-sub');
+  if(modSub) modSub.textContent = `${_variacoesCacheLoja.length} itens disponíveis`;
+  renderizarLoja();
+}
+
+function renderizarLoja(){
+  const lista = document.getElementById('lista-loja');
+  if(!_variacoesCacheLoja.length){
+    lista.innerHTML = '<div class="empty">Nenhum produto disponível em estoque.</div>';
+    return;
+  }
+  lista.innerHTML = _variacoesCacheLoja.map(v => {
+    const noCarrinho = carrinhoLoja.find(i => i.id === v.id);
+    const qtd = noCarrinho ? noCarrinho.qtd : 0;
+    return `
+      <div class="lm-cat-card no-hover">
+        <div class="lm-cat-media" style="background:linear-gradient(160deg,${gradientePara(v.produtos?.categoria||v.produtos?.nome||'x')})">
+          ${ICONE_PRODUTO}
+          <span class="lm-cat-stock ${v.estoque<=3?'baixo':''}">${v.estoque} un.</span>
+          <span class="lm-cat-chip">R$ ${Number(v.preco).toLocaleString('pt-BR')}</span>
+        </div>
+        <div class="lm-cat-body">
+          <div class="lm-cat-name">${v.produtos?.nome || '—'}</div>
+          <div class="lm-cat-meta">${v.tamanho || CATEGORIA_LABEL[v.produtos?.categoria] || ''}</div>
+          <div class="lm-stepper">
+            <button onclick="mudarQtdCarrinho('${v.id}',-1)">−</button>
+            <span>${qtd}</span>
+            <button onclick="mudarQtdCarrinho('${v.id}',1)">+</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function mudarQtdCarrinho(variacaoId, delta){
+  const variacao = _variacoesCacheLoja.find(v => v.id === variacaoId);
+  let item = carrinhoLoja.find(i => i.id === variacaoId);
+  if(!item){
+    if(delta < 0) return;
+    item = {id: variacaoId, nome: variacao.produtos?.nome, preco: Number(variacao.preco), qtd: 0};
+    carrinhoLoja.push(item);
+  }
+  item.qtd = Math.max(0, Math.min(variacao.estoque, item.qtd + delta));
+  carrinhoLoja = carrinhoLoja.filter(i => i.qtd > 0);
+  renderizarLoja();
+  renderizarCarrinhoBar();
+}
+
+function renderizarCarrinhoBar(){
+  const bar = document.getElementById('carrinho-bar');
+  const totalItens = carrinhoLoja.reduce((s,i)=>s+i.qtd,0);
+  const totalValor = carrinhoLoja.reduce((s,i)=>s+i.qtd*i.preco,0);
+  const abaAtiva = document.getElementById('loja-aba-vitrine')?.style.display !== 'none';
+  if(totalItens === 0 || !abaAtiva){ bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('carrinho-qtd').textContent = `${totalItens} ite${totalItens>1?'ns':'m'}`;
+  document.getElementById('carrinho-total').textContent = 'R$ ' + totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+async function abrirFinalizarPedido(){
+  const clientes = await sb('clients?select=id,persons(name)&order=created_at.desc');
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Finalizar pedido</h3>
+    <p style="color:var(--ink3);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Selecione o cliente</p>
+    <select id="sh-cliente-pedido" style="width:100%;margin-bottom:16px">
+      <option value="">Cliente…</option>
+      ${clientes.map(c=>`<option value="${c.id}">${c.persons?.name||'—'}</option>`).join('')}
+    </select>
+    <div style="margin-bottom:16px">
+      ${carrinhoLoja.map(i=>`<div class="row"><span class="l">${i.qtd}x ${i.nome}</span><span class="v">R$ ${(i.qtd*i.preco).toLocaleString('pt-BR')}</span></div>`).join('')}
+    </div>
+    <button class="primary" style="width:100%" onclick="confirmarPedido()">Confirmar pedido</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarPedido(){
+  const clientId = document.getElementById('sh-cliente-pedido').value;
+  if(!clientId){ toast('Escolha o cliente', true); return; }
+
+  const totalValor = carrinhoLoja.reduce((s,i)=>s+i.qtd*i.preco,0);
+  try{
+    const pedido = await sb('orders', {method:'POST', body: JSON.stringify({
+      client_id: clientId, status: 'pendente', valor_total: totalValor
+    })});
+    const orderId = pedido[0].id;
+
+    for(const item of carrinhoLoja){
+      await sb('order_items', {method:'POST', body: JSON.stringify({
+        order_id: orderId, produto_variacao_id: item.id, quantidade: item.qtd, preco_unitario: item.preco
+      }), prefer:'return=minimal'});
+    }
+
+    toast('Pedido criado — estoque atualizado');
+    fecharSheet();
+    mostrarResultadoPedido(orderId, totalValor);
+    carrinhoLoja = [];
+    await carregarLoja();
+    await carregarFinanceiro();
+    renderizarCarrinhoBar();
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+function mostrarResultadoPedido(orderId, total){
+  const dados = {
+    pedido_id: orderId, valor_total: total, itens: carrinhoLoja,
+    criado_em: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `pedido-${orderId.slice(0,8)}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ===================== FINANCEIRO =====================
+async function carregarFinanceiro(){
+  const hojeSoData = new Date().toISOString().slice(0,10);
+  const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+
+  const [parcelasAbertas, pagamentosDoMes, pedidos] = await Promise.all([
+    sb(`contract_installments?select=id,valor,status,vencimento,contracts(client_id,clients(persons(name)),projects(titulo))&status=not.eq.pago&order=vencimento.asc`),
+    sb(`payments?select=valor_pago&pago_em=gte.${inicioMes}`),
+    sb(`orders?select=id,valor_total,status,created_at,clients(persons(name))&order=created_at.desc&limit=15`)
+  ]);
+
+  const totalReceber = parcelasAbertas.reduce((s,p)=>s+Number(p.valor),0);
+  const totalRecebido = pagamentosDoMes.reduce((s,p)=>s+Number(p.valor_pago),0);
+  const totalAtrasado = parcelasAbertas.filter(p => p.status==='atrasado' || (p.vencimento < hojeSoData)).reduce((s,p)=>s+Number(p.valor),0);
+
+  document.getElementById('fin-receber').textContent = 'R$ '+totalReceber.toLocaleString('pt-BR');
+  document.getElementById('fin-recebido').textContent = 'R$ '+totalRecebido.toLocaleString('pt-BR');
+  document.getElementById('fin-atrasado').textContent = 'R$ '+totalAtrasado.toLocaleString('pt-BR');
+
+  const modFin = document.getElementById('mod-financeiro-sub');
+  if(modFin) modFin.textContent = parcelasAbertas.length + ' pendente(s)';
+
+  const listaParcelas = document.getElementById('lista-parcelas');
+  listaParcelas.innerHTML = parcelasAbertas.length ? parcelasAbertas.map(p => {
+    const atrasada = p.vencimento < hojeSoData;
+    return `
+      <div class="lm-opp-card" onclick="fecharSheet();abrirPagamento('${p.id}','${p.valor}')">
+        <div class="lm-opp-top">
+          <span class="lm-opp-nome">${p.contracts?.clients?.persons?.name || '—'}</span>
+          <span class="lm-opp-valor" style="${atrasada?'color:var(--warn)':''}">R$ ${Number(p.valor).toLocaleString('pt-BR')}</span>
+        </div>
+        <div class="lm-opp-mid">
+          <span class="lm-opp-status" style="color:${atrasada?'var(--warn)':'var(--ink2)'}">${atrasada?'Atrasada':'Pendente'}</span>
+          <span class="lm-opp-data">Vence ${fmtMesAbrev(p.vencimento)}</span>
+        </div>
+      </div>
+    `;
+  }).join('') : '<div class="empty">Nenhuma parcela em aberto.</div>';
+
+  const listaPedidos = document.getElementById('lista-pedidos');
+  listaPedidos.innerHTML = pedidos.length ? pedidos.map(o => `
+    <div class="lm-opp-card">
+      <div class="lm-opp-top">
+        <span class="lm-opp-nome">${o.clients?.persons?.name || '—'}</span>
+        <span class="lm-opp-valor">R$ ${Number(o.valor_total).toLocaleString('pt-BR')}</span>
+      </div>
+      <div class="lm-opp-mid">
+        <span class="lm-opp-status" style="color:var(--ink2)">${o.status}</span>
+        <span class="lm-opp-data">${fmtData(o.created_at)}</span>
+      </div>
+    </div>
+  `).join('') : '<div class="empty">Nenhum pedido na loja ainda.</div>';
+}
+
+function abrirConverter(leadId, personId, nichoId, nome, telDigitos){
+  converterCtx = {leadId, personId, nichoId};
+  const whatsHref = telDigitos ? `https://wa.me/55${telDigitos}` : null;
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>${nome}</h3>
+    <p style="color:var(--ink3);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Ficha do lead</p>
+    ${whatsHref ? `<a href="${whatsHref}" target="_blank" class="lm-cta" style="background:#25D366;color:#062611;text-decoration:none;display:flex;align-items:center;justify-content:center">Chamar no WhatsApp</a>` : ''}
+    <div style="margin:18px 0 8px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)">Converter em oportunidade</div>
+    <input id="sh-valor" type="number" placeholder="Valor estimado (R$)" style="width:100%;margin-bottom:10px">
+    <input id="sh-prob" type="number" min="0" max="100" placeholder="Probabilidade (%) — opcional" style="width:100%;margin-bottom:10px">
+    <input id="sh-data" type="date" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarConverter()">Criar oportunidade</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarConverter(){
+  const valor = document.getElementById('sh-valor').value;
+  const prob = document.getElementById('sh-prob').value;
+  const data = document.getElementById('sh-data').value;
+  const {leadId, personId, nichoId} = converterCtx;
+  try{
+    await sb('opportunities', {method:'POST', body: JSON.stringify({
+      lead_id: leadId, person_id: personId, nicho_id: nichoId || null,
+      valor_estimado: valor ? Number(valor) : null,
+      probabilidade: prob ? Number(prob) : null,
+      previsao_fechamento: data || null,
+      status: 'aberta'
+    })});
+    await sb(`leads?id=eq.${leadId}`, {method:'PATCH', body: JSON.stringify({status:'convertido'}), prefer:'return=minimal'});
+    toast('Oportunidade criada');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarLeads(), carregarOportunidades()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+let _kanbanSortables = [];
+
+async function carregarProjetos(){
+  if(!window._stagesCache){
+    window._stagesCache = await sb('project_stage_defs?select=*&order=ordem.asc');
+    window._transCache = await sb('project_state_transitions?select=from_stage_id,to_stage_id');
+  }
+  const stages = window._stagesCache;
+
+  const projetos = await sb('projects?select=id,titulo,valor_total,client_id,current_stage_id,clients(persons(name)),nichos(nome)&status=not.in.(cancelado)&order=created_at.desc');
+
+  _kanbanSortables.forEach(s => s.destroy());
+  _kanbanSortables = [];
+
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = stages.map(stage => {
+    const cards = projetos.filter(p => p.current_stage_id === stage.id);
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col-head"><b>${stage.nome}</b><span>${cards.length}</span></div>
+        <div class="kanban-drop" data-stage-id="${stage.id}">
+          ${cards.map(p => `
+            <div class="kanban-card" data-project-id="${p.id}" onclick="abrirDetalheProjeto('${p.id}')">
+              <div class="kc-nome">${p.clients?.persons?.name || '—'}</div>
+              <div class="kc-titulo">${p.titulo}</div>
+              <div class="kc-valor">R$ ${Number(p.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+              <div class="kc-tags">${p.nichos?.nome ? `<span class="kc-tag">${p.nichos.nome}</span>` : ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.kanban-drop').forEach(col => {
+    _kanbanSortables.push(new Sortable(col, {
+      group: 'lumiar-kanban',
+      animation: 150,
+      onEnd: async (evt) => {
+        const projectId = evt.item.dataset.projectId;
+        const novoStageId = evt.to.dataset.stageId;
+        const antigoStageId = evt.from.dataset.stageId;
+        if(novoStageId === antigoStageId) return;
+        try{
+          await sb(`projects?id=eq.${projectId}`, {method:'PATCH', body: JSON.stringify({current_stage_id: novoStageId}), prefer:'return=minimal'});
+          toast('Etapa atualizada');
+          await carregarCards();
+        }catch(e){
+          toast('Movimento não permitido: essa etapa não segue a ordem do fluxo', true);
+          await carregarProjetos();
+        }
+      }
+    }));
+  });
+}
+
+async function abrirDetalheProjeto(projectId){
+  const [proj] = await sb(`projects?id=eq.${projectId}&select=id,titulo,valor_total,client_id,nicho_id,created_at,clients(persons(name,phone,email)),project_stage_defs(nome),nichos(nome)`);
+  const contratos = await sb(`contracts?project_id=eq.${projectId}&select=id,numero`);
+
+  let financeiroHtml = `<button class="primary" style="width:100%;margin-top:6px" onclick="fecharSheet();abrirContrato('${projectId}','${proj.valor_total}')">Criar contrato</button>`;
+  if(contratos.length){
+    const parcelas = await sb(`contract_installments?contract_id=eq.${contratos[0].id}&select=id,numero_parcela,valor,status&order=numero_parcela.asc`);
+    financeiroHtml = parcelas.map(pc => `
+      <div class="row">
+        <span class="l">Parcela ${pc.numero_parcela} · R$ ${Number(pc.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+        <span class="v" style="color:${pc.status==='pago'?'var(--ok)':'var(--am)'}">
+          ${pc.status==='pago' ? 'Pago' : `<button class="primary" style="padding:5px 10px;font-size:10px" onclick="fecharSheet();abrirPagamento('${pc.id}','${pc.valor}')">Pagar</button>`}
+        </span>
+      </div>
+    `).join('');
+  }
+
+  const pessoa = proj.clients?.persons || {};
+  const telDigitos = (pessoa.phone || '').replace(/\D/g,'');
+  const whatsHref = telDigitos ? `https://wa.me/55${telDigitos}` : null;
+
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>${pessoa.name || '—'}</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:4px">${proj.titulo} · ${proj.nichos?.nome || 'Sem nicho'}</p>
+    <p style="color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">
+      Etapa atual · ${proj.project_stage_defs?.nome || '—'} &nbsp;·&nbsp; Criado ${fmtData(proj.created_at)}
+    </p>
+
+    <div style="display:flex;gap:8px;margin-bottom:18px">
+      ${whatsHref ? `<a href="${whatsHref}" target="_blank" class="lm-cta" style="flex:1;background:#25D366;color:#062611;margin-bottom:0;text-decoration:none;display:flex;align-items:center;justify-content:center">WhatsApp</a>` : ''}
+      ${pessoa.email ? `<a href="mailto:${pessoa.email}" class="lm-cta-outline" style="flex:1;margin-bottom:0;text-decoration:none;display:flex;align-items:center;justify-content:center">E-mail</a>` : ''}
+    </div>
+
+    <div class="row"><span class="l">Valor do projeto</span><span class="v">R$ ${Number(proj.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+    <div class="row"><span class="l">Telefone</span><span class="v">${pessoa.phone || '—'}</span></div>
+    <div class="row"><span class="l">E-mail</span><span class="v">${pessoa.email || '—'}</span></div>
+
+    <div style="margin-top:16px;margin-bottom:8px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)">Financeiro</div>
+    ${financeiroHtml}
+    <button class="pill" style="width:100%;justify-content:center;margin-top:16px" onclick="fecharSheet();abrirPortal('${projectId}')">Ver portal do cliente</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function moverEtapa(projectId, novoStageId){
+  try{
+    await sb(`projects?id=eq.${projectId}`, {method:'PATCH', body: JSON.stringify({current_stage_id: novoStageId}), prefer:'return=minimal'});
+    toast('Etapa atualizada');
+    await carregarProjetos();
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+let contratoCtx = null;
+
+function abrirContrato(projectId, valorTotal){
+  contratoCtx = {projectId, valorTotal};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Criar contrato</h3>
+    <p style="color:var(--ink2);font-size:13px;margin-bottom:16px">Valor total: <b style="color:var(--ink)">R$ ${Number(valorTotal).toLocaleString('pt-BR',{minimumFractionDigits:2})}</b></p>
+    <input id="sh-parcelas" type="number" min="1" max="12" value="1" placeholder="Número de parcelas" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarContrato()">Gerar contrato e parcelas</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarContrato(){
+  const nParcelas = Math.max(1, parseInt(document.getElementById('sh-parcelas').value) || 1);
+  const {projectId, valorTotal} = contratoCtx;
+  try{
+    const numero = 'CT-' + Date.now();
+    const contrato = await sb('contracts', {method:'POST', body: JSON.stringify({
+      project_id: projectId, client_id: await clientIdDoProjeto(projectId),
+      numero, valor_total: valorTotal, status: 'assinado', assinado_em: new Date().toISOString()
+    })});
+    const contractId = contrato[0].id;
+
+    const valorParcela = Math.floor((valorTotal / nParcelas) * 100) / 100;
+    let somaAcumulada = 0;
+    for(let i = 1; i <= nParcelas; i++){
+      const isUltima = i === nParcelas;
+      const valor = isUltima ? (valorTotal - somaAcumulada) : valorParcela;
+      somaAcumulada += valor;
+      const vencimento = new Date(Date.now() + (i-1)*30*24*3600*1000).toISOString().slice(0,10);
+      await sb('contract_installments', {method:'POST', body: JSON.stringify({
+        contract_id: contractId, numero_parcela: i, valor: Number(valor.toFixed(2)), vencimento
+      }), prefer:'return=minimal'});
+    }
+
+    toast('Contrato criado com ' + nParcelas + ' parcela(s)');
+    fecharSheet();
+    await carregarProjetos();
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function clientIdDoProjeto(projectId){
+  const p = await sb(`projects?id=eq.${projectId}&select=client_id`);
+  return p[0].client_id;
+}
+
+let pagamentoCtx = null;
+
+function abrirPagamento(installmentId, valor){
+  pagamentoCtx = {installmentId};
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Registrar pagamento</h3>
+    <input id="sh-valor-pago" type="number" value="${valor}" placeholder="Valor pago (R$)" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="confirmarPagamento()">Confirmar pagamento</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function confirmarPagamento(){
+  const valor = Number(document.getElementById('sh-valor-pago').value);
+  const {installmentId} = pagamentoCtx;
+  try{
+    await sb('payments', {method:'POST', body: JSON.stringify({
+      contract_installment_id: installmentId, valor_pago: valor
+    }), prefer:'return=minimal'});
+    toast('Pagamento registrado');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarProjetos(), carregarFinanceiro()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function fecharOportunidade(oppId, personId, nichoId){
+  try{
+    const stageId = stages[0].id;
+
+    const opp = await sb(`opportunities?id=eq.${oppId}&select=valor_estimado`);
+    const valor = opp[0]?.valor_estimado || 0;
+
+    await sb(`opportunities?id=eq.${oppId}`, {method:'PATCH', body: JSON.stringify({status:'ganha', ganho_em: new Date().toISOString()}), prefer:'return=minimal'});
+
+    const cliente = await sb('clients', {method:'POST', body: JSON.stringify({person_id: personId, opportunity_id: oppId})});
+    const clientId = cliente[0].id;
+
+    const pessoa = await sb(`persons?id=eq.${personId}&select=name`);
+    const nichoInfo = nichoId ? await sb(`nichos?id=eq.${nichoId}&select=nome`) : null;
+    const titulo = `${nichoInfo?.[0]?.nome || 'Projeto'} — ${pessoa[0]?.name || 'Cliente'}`;
+
+    await sb('projects', {method:'POST', body: JSON.stringify({
+      client_id: clientId, opportunity_id: oppId, nicho_id: nichoId || null,
+      titulo, valor_total: valor, current_stage_id: stageId
+    })});
+
+    toast('Fechado! Cliente e projeto criados.');
+    await Promise.all([carregarCards(), carregarOportunidades(), carregarProjetos()]);
+  }catch(e){
+    toast('Erro: ' + e.message, true);
+  }
+}
+
+async function criarLead(){
+  const nome = document.getElementById('f-nome').value.trim();
+  const tel = document.getElementById('f-tel').value.trim();
+  const nichoId = document.getElementById('f-nicho').value;
+
+  if(!nome){ toast('Digite o nome', true); return; }
+
+  try{
+    const pessoa = await sb('persons', {method:'POST', body: JSON.stringify({name: nome, phone: tel || null})});
+    const person_id = pessoa[0].id;
+
+    await sb('leads', {method:'POST', body: JSON.stringify({
+      person_id, nicho_id: nichoId || null, status: 'novo'
+    })});
+
+    toast('Lead adicionado com sucesso');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarLeads()]);
+  }catch(e){
+    toast('Erro ao salvar: ' + e.message, true);
+  }
+}
+
+function verVersoes(){
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Histórico de versões</h3>
+    <div class="v"><b>v4.1.0</b> — 30 ago 2026<br><b>Catálogo e Pacotes fundidos na Loja, menu reordenado:</b> como você insistiu — não existe mais "Catálogo" nem "Pacotes" como tópicos separados. A Loja agora tem 3 abas: Vitrine (carrinho), Serviços (preços) e Pacotes (cartões). Menu lateral e a sequência de telas reorganizados pela ordem real de trabalho: Leads → Oportunidades → Projetos → Agenda → Galeria → Loja → Financeiro → Contatos → Fornecedores → Ajustes.</div>
+    <div class="v"><b>v4.0.0</b> — 30 ago 2026<br><b>Correções e Ajustes:</b> "Ensaios" virou "Projetos". Logo fixa removida — nada pré-definido, você envia a sua em Ajustes. Menu duplicado removido.</div>
+    <div class="v"><b>v3.9.0</b> — 30 ago 2026<br><b>Galeria com upload de foto de verdade:</b> criei o armazenamento de fotos no Supabase. Escolhe o projeto, envia as fotos, elas aparecem na grade.</div>
+    <div class="v"><b>v3.8.0</b> — 30 ago 2026<br><b>Contatos e Fornecedores no ar:</b> Contatos unifica leads, clientes e fornecedores numa lista só, com filtro e WhatsApp direto.</div>
+    <div class="v"><b>v3.7.0</b> — 30 ago 2026<br><b>Pacotes virou tópico próprio:</b> tela e cartão próprios, com os 2 pacotes reais do banco.</div>
+    <div class="v"><b>v3.6.0</b> — 30 ago 2026<br><b>Agenda reconstruída:</b> lista de compromissos com data em destaque, tipo, hora, local e status colorido.</div>
+    <div class="v"><b>v3.5.0</b> — 30 ago 2026<br><b>Financeiro de verdade:</b> tela nova com 3 números reais (a receber, recebido no mês, atrasado), lista de todas as parcelas em aberto de todos os clientes e lista dos pedidos da loja.</div>
+    <div class="v"><b>v3.4.0</b> — 30 ago 2026<br><b>Loja de verdade, tópico próprio:</b> tela separada com carrinho real. Escolhe quantidade de cada produto, finaliza o pedido escolhendo o cliente, e isso cria um registro de compra de verdade no banco (tabela orders, que já existia e nunca tinha tela) — baixa o estoque automaticamente e baixa um arquivo com o resultado do pedido.</div>
+    <div class="v"><b>v3.3.1</b> — 30 ago 2026<br><b>Revertido:</b> voltei o Catálogo pra estrutura em tabela de antes, como você pediu. A tela de cartões da v3.3.0 foi desfeita.</div>
+    <div class="v"><b>v3.3.0</b> — 30 ago 2026<br><b>Catálogo virou vitrine (revertido em seguida):</b> tabela trocada por cartões estilo loja — foto (degradê), chip de preço, estoque, nome em serifa.</div>
+    <div class="v"><b>v3.2.0</b> — 30 ago 2026<br><b>Menu pra esquerda + ficha técnica completa:</b> o botão flutuante e o painel deslizante agora abrem do lado esquerdo, pra sua mão. Cartões de projeto e de lead agora abrem uma ficha completa ao clicar: telefone, e-mail, botão direto de WhatsApp, valor, etapa, data de criação — igual ao "Detalhes da Oportunidade" que você mostrou.</div>
+    <div class="v"><b>v3.1.2</b> — 30 ago 2026<br><b>Portal do cliente atualizado:</b> mesma linguagem visual das telas novas — "‹ Central" no lugar do botão redondo, nome do cliente em serifa grande, rótulos dourados discretos. A jornada por etapas continua igual (já estava correta).</div>
+    <div class="v"><b>v3.1.1</b> — 30 ago 2026<br><b>Correção:</b> o botão flutuante de menu aparecia na tela de login, antes de entrar (bug real — obrigado por marcar no print). Agora fica escondido de verdade até o login acontecer.</div>
+    <div class="v"><b>v3.1.0</b> — 30 ago 2026<br><b>Orçamentos reconstruída:</b> painel de pipeline com barra segmentada por estágio (Proposta/Negociação/Fechamento), cartões com barra de progresso individual usando os campos reais de probabilidade e previsão de fechamento (que já existiam no banco, nunca tinham sido usados). Conversão de lead agora pede probabilidade e data.<br><b>Ainda faltam:</b> Ensaios, Pacotes, Agenda e Galeria·Seleção na mesma estrutura.</div>
+    <div class="v"><b>v3.0.0</b> — 30 ago 2026<br><b>Estrutura reconstruída, não só a cor:</b> Central e Leads refeitas do zero seguindo a arte exata dos seus dois arquivos (claro/escuro) — cabeçalho com hambúrguer e avatar, banner da semana, 3 cards de estatística, grade de módulos, filtros de temperatura do lead (Quente/Novo/Retomar/Frio), cartões com iniciais. Login reconstruído com campos em pílula e o texto exato da arte.<br><b>Ainda faltam:</b> Orçamentos, Ensaios, Pacotes, Agenda e Galeria·Seleção na mesma estrutura — continuam no layout anterior por enquanto.</div>
+    <div class="v"><b>v2.6.0</b> — 30 ago 2026<br><b>Logo real aplicada:</b> o monograma "LR" e a marca completa "Lumiar Retratos & Estúdio" (arquivos que você mandou) substituem o ícone improvisado no cabeçalho e na tela de login. Nada mais de sparkle genérico.</div>
+    <div class="v"><b>v2.5.0</b> — 30 ago 2026<br><b>Cor e fonte extraídas do seu arquivo real:</b> Cormorant Garamond + Montserrat, dourado #E8A33D, cantos arredondados — tudo extraído do "Lumiar Retratos App - Escuro.html".</div>
+    <div class="v"><b>v2.4.0</b> — 30 ago 2026<br><b>Kanban de verdade:</b> Projetos virou um board estilo Trello — cartões com cliente, valor e tag do nicho, arrastáveis entre colunas (SortableJS, biblioteca real). Tentar mover pra uma etapa fora de ordem é rejeitado pelo banco e o cartão volta sozinho, com aviso. Clicar no cartão abre o financeiro (contrato/parcelas) e o portal do cliente.</div>
+    <div class="v"><b>v2.3.0</b> — 30 ago 2026<br><b>Tipografia e botão base trocados de verdade:</b> Cormorant Garamond + Montserrat (a mesma desde a v1.0) virou Space Grotesk + Inter, com títulos maiúsculos e espaçados. O botão principal, usado em quase todo canto do app (Salvar, Adicionar, Pagar), deixou de ser arredondado com gradiente — agora é sólido, reto, letras espaçadas. Cantos arredondados removidos de cards, inputs, seções e badges. Fundo neutro recalibrado.</div>
+    <div class="v"><b>v2.2.0</b> — 30 ago 2026<br><b>Cor trocada de verdade:</b> extraí a cor exata das suas referências com código (não no olho) — o dourado acinzentado do vaso de luxo (~#C8A070), não mais aquele amarelo saturado de ícone de app. Traço "—" antes dos rótulos e numeração "02/06" na navegação, como na referência da bicicleta Peugeot.</div>
+    <div class="v"><b>v2.1.0</b> — 30 ago 2026<br><b>Redesign de verdade:</b> banner deixou de ser bloco de cor sólida (agora escuro, com destaque dourado em linha fina e brilho pontual). Botões trocados por contorno fino com letras espaçadas. Grade de navegação sem sombra genérica, com divisórias finas. Menu virou painel deslizante com fundo escurecido (não mais uma caixa flutuando torta). Login com fundo texturizado e cartão translúcido. Textura de grão sutil em toda a interface.</div>
+    <div class="v"><b>v2.0.0</b> — 30 ago 2026<br><b>Telas separadas:</b> a Central deixou de ser uma página rolando infinita. Agora é 6 telas — Central, Leads, Oportunidades, Projetos, Catálogo, Agenda — cada uma com cabeçalho editorial (rótulo, título grande, linha dourada) e navegação com setas entre elas, como uma apresentação.</div>
+    <div class="v"><b>v1.9.0</b> — 30 ago 2026<br><b>Redesign da Central:</b> saudação por horário, banner âmbar com os números do negócio, ações rápidas em pílula (Novo lead, Agendar, Backup) e grade de navegação por ícones — sem mexer em nenhuma lógica de dados por baixo.</div>
+    <div class="v"><b>v1.8.0</b> — 30 ago 2026<br><b>Backup, visual e responsivo:</b> botão de exportar backup completo em JSON (o Supabase gratuito não faz backup automático — esse é o seu). Menu de navegação com ícones, virando barra lateral fixa em telas de computador/tablet. Ícones em todas as seções.</div>
+    <div class="v"><b>v1.7.0</b> — 30 ago 2026<br><b>Segurança:</b> ativado login obrigatório. As 60 tabelas agora exigem autenticação (RLS ativo no banco) — ninguém mais acessa os dados sem entrar com e-mail e senha.</div>
+    <div class="v"><b>v1.6.0</b> — 30 ago 2026<br>Agenda: marcar sessões, reuniões e entregas por projeto, com data e local. Marcar como realizado ou cancelar direto na lista. Card "Sessões (7 dias)" agora reflete a agenda real.</div>
+    <div class="v"><b>v1.5.1</b> — 30 ago 2026<br><b>Correção:</b> "Ver portal" abria um arquivo separado que não funciona no Android ao abrir da pasta Downloads (limitação do sistema, não do app). Agora o portal abre dentro da própria Central, em tela cheia.</div>
+    <div class="v"><b>v1.5.0</b> — 30 ago 2026<br><b>Correção importante:</b> a seção Projetos tinha sumido da tela na v1.4.0 (bug meu, restaurada agora). Adicionado link "Ver portal" em cada projeto, abrindo a visão do cliente.</div>
+    <div class="v"><b>v1.4.1</b> — 30 ago 2026<br>Correção: produtos sem variação cadastrada (ex: Porta-retrato Digital) agora têm botão "Adicionar variação" em vez de ficar travado com traço.</div>
+    <div class="v"><b>v1.4.0</b> — 30 ago 2026<br>Catálogo: editar preços de serviços e produtos existentes, e cadastrar novos produtos com preço e estoque.</div>
+    <div class="v"><b>v1.3.0</b> — 30 ago 2026<br>Kanban: mover projeto pelas etapas, respeitando a máquina de estados (só mostra as próximas etapas realmente permitidas).</div>
+    <div class="v"><b>v1.2.0</b> — 30 ago 2026<br>Financeiro: criar contrato com parcelas a partir de um projeto, e registrar pagamentos. Parcela quitada muda de status sozinha.</div>
+    <div class="v"><b>v1.1.0</b> — 30 ago 2026<br>Funil completo: converter lead em oportunidade, e fechar oportunidade gerando cliente + projeto automaticamente.</div>
+    <div class="v"><b>v1.0.0</b> — 30 ago 2026<br>Primeira tela conectada de verdade ao banco Supabase. Cadastro de lead e visão geral com dados ao vivo.</div>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+function fecharSheet(){ document.getElementById('sheet').classList.remove('on'); }
+
+async function abrirPortal(projectId){
+  document.getElementById('portal-overlay').style.display = 'block';
+  const content = document.getElementById('portal-content');
+  content.innerHTML = '<div class="empty">carregando…</div>';
+
+  try{
+    const [projetos, todasEtapas] = await Promise.all([
+      sb(`projects?id=eq.${projectId}&select=titulo,valor_total,current_stage_id,clients(persons(name)),project_stage_defs(slug,ordem)`),
+      sb('project_stage_defs?select=slug,nome,ordem,is_terminal&order=ordem.asc')
+    ]);
+    const p = projetos[0];
+    const nomeCliente = p.clients?.persons?.name || 'Cliente';
+    const etapaAtualOrdem = p.project_stage_defs?.ordem || 0;
+    const etapasVisiveis = todasEtapas.filter(e => e.slug !== 'cancelado');
+
+    const contratos = await sb(`contracts?project_id=eq.${projectId}&select=id,valor_total`);
+    let financeiroHtml = '<p style="color:var(--ink3);font-size:13px">Ainda não há contrato registrado.</p>';
+    if(contratos.length){
+      const parcelas = await sb(`contract_installments?contract_id=eq.${contratos[0].id}&select=numero_parcela,valor,status,vencimento&order=numero_parcela.asc`);
+      const pago = parcelas.filter(pc=>pc.status==='pago').reduce((s,pc)=>s+Number(pc.valor),0);
+      const total = Number(contratos[0].valor_total);
+      financeiroHtml = `
+        <div class="row"><span class="l">Valor total</span><span class="v">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+        <div class="row"><span class="l">Já pago</span><span class="v" style="color:var(--ok)">R$ ${pago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+        <div class="row"><span class="l">Falta pagar</span><span class="v" style="color:var(--am)">R$ ${(total-pago).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>
+      ` + parcelas.map(pc => `
+        <div class="row">
+          <span class="l">Parcela ${pc.numero_parcela} · vence ${new Date(pc.vencimento+'T12:00:00').toLocaleDateString('pt-BR')}</span>
+          <span class="v" style="color:${pc.status==='pago'?'var(--ok)':'var(--am)'}">${pc.status==='pago' ? 'Pago' : 'R$ '+Number(pc.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+        </div>
+      `).join('');
+    }
+
+    content.innerHTML = `
+      <div class="lm-portal-eyebrow">Visão do cliente</div>
+      <div class="lm-view-title" style="margin-bottom:4px">${nomeCliente}</div>
+      <div class="lm-view-sub">${p.titulo}</div>
+
+      <div class="lm-pipeline-panel">
+        <div class="lm-pipeline-eyebrow">Onde está o projeto</div>
+        <div class="steps">
+          ${etapasVisiveis.map(e => {
+            const cls = e.ordem < etapaAtualOrdem ? 'done' : (e.ordem === etapaAtualOrdem ? 'current' : '');
+            return `<div class="step ${cls}"><div class="line"></div><div class="dot">${cls==='done'?'✓':''}</div><div class="label">${e.nome}</div></div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="lm-pipeline-panel" style="margin-bottom:0">
+        <div class="lm-pipeline-eyebrow">Financeiro</div>
+        ${financeiroHtml}
+      </div>
+    `;
+  }catch(e){
+    content.innerHTML = `<div class="empty">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function fecharPortal(){ document.getElementById('portal-overlay').style.display = 'none'; }
+
+function toggleFabMenu(){
+  const aberto = document.getElementById('nav-backdrop').classList.toggle('on');
+  document.getElementById('fab-toggle').innerHTML = aberto
+    ? '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+}
+
+function irPara(id){
+  document.getElementById('nav-backdrop')?.classList.remove('on');
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function mostrarView(nome){
+  document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+  const alvo = document.getElementById(`view-${nome}`);
+  if(alvo) alvo.style.display = 'block';
+  const backdrop = document.getElementById('nav-backdrop');
+  if(backdrop?.classList.contains('on')){
+    backdrop.classList.remove('on');
+    document.getElementById('fab-toggle').innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>';
+  }
+  document.getElementById('app').scrollTo({top:0, behavior:'instant'});
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+async function exportarBackup(){
+  toggleFabMenu();
+  toast('Preparando backup…');
+  try{
+    const tabelas = ['persons','leads','opportunities','clients','projects','project_stage_history',
+      'contracts','contract_installments','payments','nichos','servicos','pacotes','pacote_itens',
+      'produtos','produto_variacoes','agenda_events'];
+    const dados = {};
+    for(const t of tabelas){
+      dados[t] = await sb(`${t}?select=*`);
+    }
+    dados._exportado_em = new Date().toISOString();
+    dados._sistema = 'Lumiar OS · Backup manual';
+
+    const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dataStr = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `lumiar-backup-${dataStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Backup baixado com sucesso');
+  }catch(e){
+    toast('Erro ao gerar backup: ' + e.message, true);
+  }
+}
+
+async function carregarAgendaProjetos(){
+  window._projetosCacheAgenda = await sb('projects?select=id,titulo,clients(persons(name))&status=not.in.(concluido,cancelado)&order=created_at.desc');
+}
+
+function abrirNovoEvento(){
+  const projetos = window._projetosCacheAgenda || [];
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Novo compromisso</h3>
+    <select id="ag-projeto" style="width:100%;margin-bottom:10px">
+      <option value="">Projeto…</option>
+      ${projetos.map(p=>`<option value="${p.id}">${p.clients?.persons?.name || '—'} · ${p.titulo}</option>`).join('')}
+    </select>
+    <select id="ag-tipo" style="width:100%;margin-bottom:10px">
+      <option value="sessao">Sessão</option>
+      <option value="reuniao">Reunião</option>
+      <option value="entrega">Entrega</option>
+      <option value="revelacao">Revelação</option>
+      <option value="outro">Outro</option>
+    </select>
+    <input id="ag-data" type="datetime-local" style="width:100%;margin-bottom:10px">
+    <input id="ag-local" placeholder="Local (opcional)" style="width:100%;margin-bottom:14px">
+    <button class="primary" style="width:100%" onclick="criarEvento()">Agendar</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function criarEvento(){
+  const projectId = document.getElementById('ag-projeto').value;
+  const tipo = document.getElementById('ag-tipo').value;
+  const data = document.getElementById('ag-data').value;
+  const local = document.getElementById('ag-local').value.trim();
+
+  if(!projectId || !data){ toast('Escolha o projeto e a data', true); return; }
+
+  try{
+    const projInfo = await sb(`projects?id=eq.${projectId}&select=titulo,clients(persons(name))`);
+    const titulo = `${TIPO_LABEL[tipo]} — ${projInfo[0]?.clients?.persons?.name || projInfo[0]?.titulo}`;
+
+    await sb('agenda_events', {method:'POST', body: JSON.stringify({
+      project_id: projectId, tipo, titulo, local: local || null,
+      inicio: new Date(data).toISOString()
+    }), prefer:'return=minimal'});
+
+    toast('Evento agendado');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarAgenda()]);
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+const TIPO_LABEL = {sessao:'Sessão', reuniao:'Reunião', entrega:'Entrega', revelacao:'Revelação', outro:'Evento'};
+const MESES_ABREV = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+async function carregarAgenda(){
+  const eventos = await sb('agenda_events?select=id,tipo,titulo,local,inicio,status&order=inicio.asc&limit=20');
+  document.getElementById('agenda-contagem').textContent = `${eventos.length} compromisso(s)`;
+  const lista = document.getElementById('lista-agenda');
+  if(!eventos.length){ lista.innerHTML = '<div class="empty">Nenhum evento agendado ainda.</div>'; return; }
+  lista.innerHTML = eventos.map(e => {
+    const d = new Date(e.inicio);
+    const statusColor = e.status==='realizado' ? 'var(--ok)' : e.status==='cancelado' ? 'var(--ink3)' : 'var(--am)';
+    return `
+      <div class="lm-agenda-row" onclick="abrirAcaoEvento('${e.id}','${e.status}')">
+        <div class="lm-agenda-data">
+          <div class="dia">${String(d.getDate()).padStart(2,'0')}</div>
+          <div class="mes">${MESES_ABREV[d.getMonth()]}</div>
+        </div>
+        <div class="lm-agenda-body">
+          <div class="lm-agenda-titulo">${e.titulo}</div>
+          <div class="lm-agenda-meta">${TIPO_LABEL[e.tipo]||e.tipo} · ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}${e.local ? ' · '+e.local : ''}</div>
+        </div>
+        <div class="lm-agenda-status"><span class="lm-cat-chip" style="position:static;color:${statusColor};background:var(--panel2)">${e.status}</span></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function abrirAcaoEvento(id, statusAtual){
+  if(statusAtual !== 'agendado' && statusAtual !== 'confirmado'){
+    toast('Este evento já foi ' + statusAtual);
+    return;
+  }
+  document.getElementById('sheet-content').innerHTML = `
+    <h3>Atualizar compromisso</h3>
+    <button class="primary" style="width:100%;margin-bottom:10px" onclick="mudarStatusEvento('${id}','realizado')">Marcar como realizado</button>
+    <button class="lm-cta-outline" style="margin-bottom:0" onclick="mudarStatusEvento('${id}','cancelado')">Cancelar compromisso</button>
+  `;
+  document.getElementById('sheet').classList.add('on');
+}
+
+async function mudarStatusEvento(id, status){
+  try{
+    await sb(`agenda_events?id=eq.${id}`, {method:'PATCH', body: JSON.stringify({status}), prefer:'return=minimal'});
+    toast('Status atualizado');
+    fecharSheet();
+    await Promise.all([carregarCards(), carregarAgenda()]);
+  }catch(e){ toast('Erro: ' + e.message, true); }
+}
+
+// ===================== AJUSTES (local, nunca vai pro banco) =====================
+function aplicarLogoSalva(){
+  const logo = localStorage.getItem('lumiar_logo_b64');
+  const topo = document.getElementById('brand-mark-topo');
+  const loginSlot = document.getElementById('login-logo-slot');
+  const preview = document.getElementById('ajustes-logo-preview');
+  if(logo){
+    if(topo) topo.innerHTML = `<img src="${logo}" style="width:100%;height:100%;object-fit:cover">`;
+    if(loginSlot) loginSlot.innerHTML = `<img src="${logo}" style="max-width:100%;max-height:80px;object-fit:contain">`;
+    if(preview) preview.innerHTML = `<img src="${logo}" style="width:100%;height:100%;object-fit:cover">`;
+  }
+}
+
+function salvarLogoPersonalizada(){
+  const input = document.getElementById('ajustes-logo-arquivo');
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    localStorage.setItem('lumiar_logo_b64', e.target.result);
+    aplicarLogoSalva();
+    toast('Logo salva neste aparelho');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removerLogoPersonalizada(){
+  localStorage.removeItem('lumiar_logo_b64');
+  const topo = document.getElementById('brand-mark-topo');
+  const loginSlot = document.getElementById('login-logo-slot');
+  const preview = document.getElementById('ajustes-logo-preview');
+  if(topo) topo.textContent = 'L';
+  if(loginSlot) loginSlot.innerHTML = `<span style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--ink)">Lumiar</span>`;
+  if(preview) preview.innerHTML = `<svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--ink3);stroke-width:1.3;fill:none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>`;
+  toast('Logo removida, voltou ao padrão');
+}
+
+function carregarAjustes(){
+  aplicarLogoSalva();
+  const dados = JSON.parse(localStorage.getItem('lumiar_dados_sensiveis') || '{}');
+  if(document.getElementById('ajustes-cnpj')) document.getElementById('ajustes-cnpj').value = dados.cnpj || '';
+  if(document.getElementById('ajustes-chave-pix')) document.getElementById('ajustes-chave-pix').value = dados.pix || '';
+  if(document.getElementById('ajustes-endereco')) document.getElementById('ajustes-endereco').value = dados.endereco || '';
+  if(document.getElementById('ajustes-email')) document.getElementById('ajustes-email').textContent = sessaoAtual?.email || '—';
+}
+
+function salvarDadosSensiveis(){
+  const dados = {
+    cnpj: document.getElementById('ajustes-cnpj').value.trim(),
+    pix: document.getElementById('ajustes-chave-pix').value.trim(),
+    endereco: document.getElementById('ajustes-endereco').value.trim()
+  };
+  localStorage.setItem('lumiar_dados_sensiveis', JSON.stringify(dados));
+  toast('Salvo neste aparelho');
+}
+
+function definirSaudacao(){
+  const h = new Date().getHours();
+  const texto = h < 6 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  const el = document.getElementById('greet');
+  if(el) el.textContent = texto;
+
+  const avatarEl = document.getElementById('avatar-topo');
+  if(avatarEl && sessaoAtual?.email) avatarEl.textContent = sessaoAtual.email[0].toUpperCase();
+
+  const semanaEl = document.getElementById('hero-semana');
+  if(semanaEl){
+    const inicio = new Date(new Date().getFullYear(),0,1);
+    const semana = Math.ceil((((new Date() - inicio) / 86400000) + inicio.getDay()+1)/7);
+    semanaEl.textContent = 'Semana ' + semana;
+  }
+}
+
+async function iniciarApp(){
+  definirSaudacao();
+  try{
+    await carregarNichos();
+    await Promise.all([carregarCards(), carregarLeads(), carregarOportunidades(), carregarProjetos(), carregarCatalogoServicos(), carregarCatalogoProdutos(), carregarAgendaProjetos(), carregarAgenda(), carregarLoja(), carregarFinanceiro(), carregarPacotes(), carregarContatos(), carregarFornecedores()]);
+  }catch(e){
+    toast('Erro ao conectar: ' + e.message, true);
+  }
+}
+
+(async function boot(){
+  aplicarLogoSalva();
+  const temSessao = await tentarRestaurarSessao();
+  if(temSessao){
+    entrarNoApp();
+  }
+  // se não tem sessão, a tela de login (que já começa visível) permanece
+})();
+</script>
+</body>
+</html>
